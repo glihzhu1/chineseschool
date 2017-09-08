@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/layout.xhtml">
+  <ui:define name="content">
+    <h:form prependId="false" id="growlForm">
+      <p:growl id="growl" showDetail="false" />
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    <h:form prependId="false" id="dataForm">
+      <p:panel id="data" toggleable="true" toggleSpeed="250">
+        <p:dataTable id="list" value="#{courseinformationBean.allCourseinformations}" rowKey="#{courseinformation.id}"
+                 selection="#{courseinformationBean.courseinformation}" selectionMode="single" 
+        var="courseinformation" rendered="#{not empty courseinformationBean.allCourseinformations}" resizableColumns="true" 
+        filteredValue="#{courseinformationBean.filteredCourseinformations}" widgetVar="courseinformationsTable"
+        paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
+
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search Courseinformations:" />
+					<h:inputText id="globalFilter"
+						onkeyup="PF('courseinformationsTable').filter()" />
+				</p:outputPanel>
+			</f:facet>
+
+			<p:column headerText="Course Code" sortBy="#{courseinformation.coursecode}" 
+        		 filterMatchMode="contains" filterBy="#{courseinformation.coursecode}">
+            	<h:outputText value="#{courseinformation.coursecode}" />
+           	</p:column>
+       		
+			<p:column headerText="Grade" sortBy="#{courseinformation.coursegrade}" 
+        		 filterMatchMode="contains" filterBy="#{courseinformation.coursegrade}">
+            	<h:outputText value="#{courseinformation.coursegrade}" />
+           	</p:column>
+           	
+           	<p:column headerText="Course Name" sortBy="#{courseinformation.coursename}" 
+        		 filterMatchMode="contains" filterBy="#{courseinformation.coursename}">
+            	<h:outputText value="#{courseinformation.coursename}" />
+           	</p:column>
+           	
+        	<p:column styleClass="action-column">
+            <f:facet name="header">
+              <h:outputText value="Actions" />
+            </f:facet>
+            
+            <p:commandButton id="editButton" icon="fa fa-fw fa-edit" update=":editForm:editPanelGrid" 
+              action="#{courseinformationBean.onEdit}" oncomplete="PF('editDialogWidget').show()" title="#{messages.label_edit}">
+              <f:setPropertyActionListener value="#{courseinformation}" target="#{courseinformationBean.courseinformation}" />
+            </p:commandButton>
+            <p:tooltip for="editButton" position="top" value="#{messages.label_edit} courseinformation" showEffect="fade" hideEffect="fade" />
+            
+          </p:column>
+        </p:dataTable>
+      </p:panel>
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    <p:dialog id="createDialog" header="#{messages.label_create} Courseinformation" modal="true" widgetVar="createDialogWidget" dynamic="true" visible="#{courseinformationBean.createDialogVisible}" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":dataForm:data" listener="#{courseinformationBean.handleDialogClose}" />
+      <p:outputPanel id="createPanel">
+        <h:form id="createForm" enctype="multipart/form-data">
+          <h:panelGrid id="createPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+          	<h:panelGrid columns="8" styleClass="dialog">
+          		<h:outputText value="Course Code"/>
+	          	<h:inputText id="coursecode" required="true" requiredMessage="Course information code is required"
+	          		value="#{courseinformationBean.courseinformation.coursecode}" />
+	          	<p:message for="coursecode"></p:message>
+	          	<p:spacer width="10" height="10"></p:spacer>
+	          	
+	          	<p:selectOneMenu id="coursetype" value="#{courseinformationBean.courseinformation.coursetype}" style="width:125px">
+            		<f:selectItem itemLabel="Adult Class" itemValue="ADULT" />
+            		<f:selectItem itemLabel="Chinese" itemValue="CHINESE" />
+            		<f:selectItem itemLabel="Mathematics" itemValue="MATHEMATICS" />
+        		</p:selectOneMenu>
+        
+	          	<h:outputText value="Course Name:"/>
+	          	<h:inputText id="coursename" required="true" requiredMessage="Course information name is required"
+	          		value="#{courseinformationBean.courseinformation.coursename}" />
+	          	<p:message for="coursename"></p:message>
+	          	
+            </h:panelGrid>
+            
+            <h:panelGrid columns="4" styleClass="dialog">
+            	<p:selectOneMenu id="coursegrade" value="#{courseinformationBean.courseinformation.coursegrade}" style="width:125px">
+            		<f:selectItem itemLabel="N/A" itemValue="" />
+            		<f:selectItem itemLabel="1st Grade" itemValue="1st Grade" />
+            		<f:selectItem itemLabel="2nd Grade" itemValue="2nd Grade" />
+            		<f:selectItem itemLabel="3rd Grade" itemValue="3rd Grade" />
+            		<f:selectItem itemLabel="4th Grade" itemValue="4th Grade" />
+            		<f:selectItem itemLabel="5th Grade" itemValue="5th Grade" />
+            		<f:selectItem itemLabel="6th Grade" itemValue="6th Grade" />
+        		</p:selectOneMenu>
+        		<p:spacer width="10" height="10"></p:spacer>
+          		<h:outputText value="Chinese Name:"/>
+	          	<h:inputText value="#{courseinformationBean.courseinformation.chinesecoursename}" />
+            	
+            </h:panelGrid>
+             
+      	  </h:panelGrid>
+      	  
+      	  <p:commandButton id="createSaveButton" value="#{messages.label_save}" 
+      	    process="createForm" action="#{courseinformationBean.persist}" update=":dataForm:data createPanelGrid :growlForm:growl" />
+          <p:commandButton id="createCloseButton" value="#{messages.label_close}" onclick="PF('createDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:dialog id="editDialog" header="#{messages.label_edit} Courseinformation" modal="true" widgetVar="editDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":dataForm:data" listener="#{courseinformationBean.handleDialogClose}" />
+      <p:outputPanel id="editPanel">
+        <h:form id="editForm" enctype="multipart/form-data">
+          <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+          	<h:panelGrid columns="8" styleClass="dialog">
+          		<h:outputText value="Course Code"/>
+	          	<h:inputText id="coursecodeedit" required="true" requiredMessage="Course information code is required"
+	          		value="#{courseinformationBean.courseinformation.coursecode}" />
+	          	<p:message for="coursecodeedit"></p:message>
+	          	<p:spacer width="10" height="10"></p:spacer>
+	          	
+	          	<p:selectOneMenu id="coursetypeedit" value="#{courseinformationBean.courseinformation.coursetype}" style="width:125px">
+            		<f:selectItem itemLabel="Adult Class" itemValue="ADULT" />
+            		<f:selectItem itemLabel="Chinese" itemValue="CHINESE" />
+            		<f:selectItem itemLabel="Mathematics" itemValue="MATHEMATICS" />
+        		</p:selectOneMenu>
+        
+	          	<h:outputText value="Course Name:"/>
+	          	<h:inputText id="coursenameedit" required="true" requiredMessage="Course information name is required"
+	          		value="#{courseinformationBean.courseinformation.coursename}" />
+	          	<p:message for="coursenameedit"></p:message>
+	          	
+            </h:panelGrid>
+            
+            <h:panelGrid columns="4" styleClass="dialog">
+            	<p:selectOneMenu id="coursegradeedit" value="#{courseinformationBean.courseinformation.coursegrade}" style="width:125px">
+            		<f:selectItem itemLabel="N/A" itemValue="" />
+            		<f:selectItem itemLabel="1st Grade" itemValue="1st Grade" />
+            		<f:selectItem itemLabel="2nd Grade" itemValue="2nd Grade" />
+            		<f:selectItem itemLabel="3rd Grade" itemValue="3rd Grade" />
+            		<f:selectItem itemLabel="4th Grade" itemValue="4th Grade" />
+            		<f:selectItem itemLabel="5th Grade" itemValue="5th Grade" />
+            		<f:selectItem itemLabel="6th Grade" itemValue="6th Grade" />
+        		</p:selectOneMenu>
+        		<p:spacer width="10" height="10"></p:spacer>
+          		<h:outputText value="Chinese Name:"/>
+	          	<h:inputText value="#{courseinformationBean.courseinformation.chinesecoursename}" />
+            	
+            </h:panelGrid>
+            
+      	  </h:panelGrid>
+          <p:commandButton id="editSaveButton" value="#{messages.label_save}" 
+          	process="editForm" action="#{courseinformationBean.persist}" update=":dataForm:data editPanelGrid :growlForm:growl" />
+          <p:commandButton id="editCloseButton" value="#{messages.label_close}" onclick="PF('editDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+   
+  </ui:define>
+</ui:composition>
+</html>

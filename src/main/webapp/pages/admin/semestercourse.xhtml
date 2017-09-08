@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+<ui:composition template="/templates/layout.xhtml">
+  <ui:define name="content">
+    <h:form prependId="false" id="growlForm">
+      <p:growl id="growl" showDetail="false" />
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    
+    
+    <h:form prependId="false" id="dataForm">
+      <p:panel id="data" toggleable="true" toggleSpeed="250">
+        <p:dataTable id="list" value="#{semestercourseBean.allSemestercourses}" rowKey="#{semestercourse.id}"
+                 selection="#{semestercourseBean.semestercourse}" selectionMode="single" 
+        var="semestercourse" rendered="#{not empty semestercourseBean.allSemestercourses}" resizableColumns="true" 
+        filteredValue="#{semestercourseBean.filteredSemestercourses}" widgetVar="semestercoursesTable"
+        paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
+
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search Semester courses:" />
+					<h:inputText id="globalFilter"
+						onkeyup="PF('semestercoursesTable').filter()" />
+				</p:outputPanel>		
+			</f:facet>
+
+			<p:column headerText="Course (Status)" sortBy="#{semestercourse.semestercoursecode}"
+				filterMatchMode="contains" filterBy="#{semestercourse.semestercoursecode}">
+            	<h:outputText value="#{semestercourse.semestercoursecode}-" />
+            	<h:outputText value="(#{semestercourse.status})" style="font-weight: bold; color: red;"/>
+       		</p:column>
+       		<p:column headerText="Grade" sortBy="#{semestercourse.courseinfoid.coursegrade}" 
+       			filterMatchMode="contains" filterBy="#{semestercourse.courseinfoid.coursegrade}">
+            	<h:outputText value="#{semestercourse.courseinfoid.coursegrade}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Name" sortBy="#{semestercourse.courseinfoid.coursename}" 
+       			filterMatchMode="contains" filterBy="#{semestercourse.courseinfoid.coursename}">
+            	<h:outputText value="#{semestercourse.courseinfoid.coursename}" >
+            	</h:outputText>
+        	</p:column>
+       		<p:column headerText="Time (Room)" sortBy="#{semestercourse.starttime}" 
+       			filterMatchMode="contains" filterBy="#{semestercourse.room}">
+            	<h:outputText value="#{semestercourse.starttime}-#{semestercourse.endtime} (#{semestercourse.room})" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Price (capacity)" sortBy="#{semestercourse.price}" >
+            	<h:outputText value="$#{semestercourse.price} (#{semestercourse.currentcapacity}/#{semestercourse.maxcapacity} enrolled)" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Book" sortBy="#{semestercourse.bookitemid.bookname}"
+       			filterMatchMode="contains" filterBy="#{semestercourse.bookitemid.bookname}">
+            	<p:commandLink value="#{semestercourse.bookitemid ne null? semestercourse.bookitemid.bookname : ''}"
+            		update="bookitemDetailrow" 
+            		oncomplete="PF('bookitemOProw').show('#{component.clientId}')">
+            		<f:setPropertyActionListener value="#{semestercourse}" target="#{semestercourseBean.semestercourse}" />
+            	</p:commandLink>
+       		</p:column>
+       		<p:column headerText="Teacher" sortBy="#{semestercourse.teacherid.lastname}" 
+        		filterMatchMode="contains" filterBy="#{semestercourse.teacherid.lastname}">
+            	<p:commandLink value="#{semestercourse.teacherid.lastname}, #{semestercourse.teacherid.firstname}"
+            		update="teacherDetailrow" 
+            		oncomplete="PF('teacherOProw').show('#{component.clientId}')">
+            		<f:setPropertyActionListener value="#{semestercourse}" target="#{semestercourseBean.semestercourse}" />
+            	</p:commandLink>
+        	</p:column>
+        	<p:column styleClass="action-column">
+            <f:facet name="header">
+              <h:outputText value="Actions" />
+            </f:facet>
+            
+            <p:commandButton id="editButton" icon="fa fa-fw fa-edit" update=":editForm:editPanelGrid" 
+              action="#{semestercourseBean.onEdit}" oncomplete="PF('editDialogWidget').show()" title="#{messages.label_edit}">
+              <f:setPropertyActionListener value="#{semestercourse}" target="#{semestercourseBean.semestercourse}" />
+            </p:commandButton>
+            <p:tooltip for="editButton" position="top" value="#{messages.label_edit}" showEffect="fade" hideEffect="fade" />
+            
+            <p:menuButton value="More">
+              <p:menuitem value="Close" rendered="#{semestercourse.status ne 'Closed'}"
+                oncomplete="PF('deactivateDialogWidget').show()"
+                actionListener="#{semestercourseBean.onChangeSemesterCourseAction}" icon="fa fa-fw fa-close">
+                <f:param name="semestercourserowid" value="#{semestercourse.id}"/>
+              </p:menuitem>
+              <p:menuitem value="Homepage" url="http://www.primefaces.org" target="_blank" icon="ui-icon-extlink"/>
+            </p:menuButton>
+    
+          
+          </p:column>
+        </p:dataTable>
+      </p:panel>
+      <p:overlayPanel widgetVar="teacherOProw" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+	    <p:outputPanel id="teacherDetailrow" style="text-align:center;">
+	      <p:panelGrid  columns="2">
+	        <f:facet name="header">
+	          <h:outputText value="Detail" />
+	        </f:facet>
+	 		<h:outputText value="Name:" />
+	        <h:outputText value="#{semestercourseBean.semestercourse.teacherid.lastname}, #{semestercourseBean.semestercourse.teacherid.firstname}" />
+	 		<h:outputText value="Email:" />
+	        <h:outputText value="#{semestercourseBean.semestercourse.teacherid.email}" />
+	        <h:outputText value="Home Phone: " />
+	        <h:outputText value="#{semestercourseBean.semestercourse.teacherid.homephone}" />
+	        <h:outputText value="Cell Phone: " />
+	        <h:outputText value="#{semestercourseBean.semestercourse.teacherid.cellphone}" />
+	 	  </p:panelGrid>
+	    </p:outputPanel>
+	  </p:overlayPanel>
+	  <p:overlayPanel widgetVar="bookitemOProw" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+	    <p:outputPanel id="bookitemDetailrow" style="text-align:center;">
+	      <p:panelGrid  columns="2">
+	        <f:facet name="header">
+	          <h:outputText value="Detail" />
+	        </f:facet>
+	        <h:outputText value="Book Code: " />
+	        <h:outputText value="#{semestercourseBean.semestercourse.bookitemid.bookcode}" />
+	 		<h:outputText value="Name:" />
+	        <h:outputText value="#{semestercourseBean.semestercourse.bookitemid.bookname}" />
+	 		<h:outputText value="Descriptionl:" />
+	        <h:outputText value="#{semestercourseBean.semestercourse.bookitemid.bookdescription}" />
+	        <h:outputText value="Price/Discount " />
+	        <h:outputText value="#{semestercourseBean.semestercourse.bookitemid.bookprice}/#{semestercourseBean.semestercourse.bookitemid.bookdiscountprice}" />
+	        <h:outputText value="Stock/Sold:" />
+	        <h:outputText value="#{semestercourseBean.semestercourse.bookitemid.amountinstock}/#{semestercourseBean.semestercourse.bookitemid.amountsold}" />
+	        
+	      </p:panelGrid>
+	    </p:outputPanel>
+	  </p:overlayPanel>
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    
+    <h:form prependId="false" id="switchSemesterForm">
+      <p:panelGrid columns="3">
+        <p:spacer width="2" height="10"></p:spacer>
+        <p:selectOneMenu size="1" id="semesterDropdown" 
+		  value="#{semestercourseBean.semesterId}" >
+		  <p:ajax event="change" update=":dataForm:data"
+    					listener="#{semestercourseBean.onChangeSemesterSelection}" />
+		  <f:selectItems value="#{semestercourseBean.semesterDropdown}" />
+	    </p:selectOneMenu>
+	    <p:outputLabel value="switch semester here, it is rarely needed!" 
+	      style="color: red;"></p:outputLabel>
+	  </p:panelGrid>		
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    
+    
+    <p:dialog id="createDialog" header="#{messages.label_create} Class for '#{semestercourseBean.latestSemester.description}'" modal="true" widgetVar="createDialogWidget" dynamic="true" visible="#{semestercourseBean.createDialogVisible}" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":dataForm:data" listener="#{semestercourseBean.handleDialogClose}" />
+      <p:outputPanel id="createPanel">
+        <h:form id="createForm" enctype="multipart/form-data">
+          <h:panelGrid id="createPanelGrid" columns="1" styleClass="dialog">
+          	<h:panelGroup>
+          		<h:panelGrid columns="3" styleClass="dialog">
+	          		<h:panelGrid columns="1">
+		          		<h:outputText value="Class Code:" style="font-weight: bold;"/>
+		          		<h:inputText id="semestercoursecode" required="true" requiredMessage="Class code is required"
+		          			value="#{semestercourseBean.semestercourse.semestercoursecode}" />
+		          		<p:watermark for="semestercoursecode" value="required, ex CHN-**" />
+		      			<p:message for="semestercoursecode"></p:message>
+		          	</h:panelGrid>
+		          	<p:spacer width="10" height="10"></p:spacer>
+		          	<h:panelGrid columns="1">
+      					<h:outputText value="Class For: " />
+      					<h:panelGrid columns="3">
+		 					<h:selectOneListbox size="1" id="courseDropdown"
+		 						valueChangeListener="#{semestercourseBean.onChangeCourseinfoId}"
+		 						value="#{semestercourseBean.courseinfoId}" >
+								<f:selectItems value="#{semestercourseBean.courseinfoDropdown}" />
+							</h:selectOneListbox>
+							<p:spacer width="5" height="10"></p:spacer>
+							<p:commandButton update="courseinfoDetail" oncomplete="PF('courseinfoOP').show('#{component.clientId}')" icon="ui-icon-search" title="View">
+	            			</p:commandButton>
+            			</h:panelGrid>
+      				</h:panelGrid>
+            	</h:panelGrid>
+      		</h:panelGroup>
+      		<br/>
+      		<h:panelGroup>
+          		<h:panelGrid columns="5" styleClass="dialog">
+	          		<h:panelGrid columns="1">
+		          		<h:outputText value="Room:" style="font-weight: bold;"/>
+		          		<h:inputText id="room" required="true" requiredMessage="Room is required"
+		          			value="#{semestercourseBean.semestercourse.room}" />
+		          		<p:watermark for="room" value="Required" />
+		          		<p:message for="room"></p:message>
+		          	</h:panelGrid>
+		          	<p:spacer width="10" height="10"></p:spacer>
+	          		<h:panelGrid columns="1">
+	          			<h:outputText value="Start time:"/>
+	          			<h:selectOneListbox size="1" id="starttime"
+		 					value="#{semestercourseBean.semestercourse.starttime}" >
+							<f:selectItem itemValue="12:00" itemLabel="12:00"/>
+							<f:selectItem itemValue="13:00" itemLabel="13:00"/>
+							<f:selectItem itemValue="14:00" itemLabel="14:00"/>
+							<f:selectItem itemValue="15:00" itemLabel="15:00"/>
+							<f:selectItem itemValue="16:00" itemLabel="16:00"/>
+						</h:selectOneListbox>
+	          		</h:panelGrid>
+	          		<p:spacer width="10" height="10"></p:spacer>
+	          		<h:panelGrid>
+	          			<h:outputText value="End time:"/>
+	          			<h:selectOneListbox size="1" id="endtime"
+		 					value="#{semestercourseBean.semestercourse.endtime}" >
+							<f:selectItem itemValue="12:50" itemLabel="12:50"/>
+							<f:selectItem itemValue="13:50" itemLabel="13:50"/>
+							<f:selectItem itemValue="14:50" itemLabel="14:50"/>
+							<f:selectItem itemValue="15:50" itemLabel="15:50"/>
+							<f:selectItem itemValue="16:50" itemLabel="16:50"/>
+						</h:selectOneListbox>
+      				</h:panelGrid>
+            	</h:panelGrid>
+      		</h:panelGroup>
+      		<br/>
+      		<h:panelGroup>
+          		<h:panelGrid columns="3">
+          			<h:panelGrid columns="1">
+      					<h:outputText value="Teacher: " />
+      					<h:panelGrid columns="3">
+		 					<h:selectOneListbox size="1" id="teacherDropdown" 
+		 						valueChangeListener="#{semestercourseBean.onChangeTeacherId}"
+		 						value="#{semestercourseBean.teacherId}" >
+								<f:selectItems value="#{semestercourseBean.teacherDropdown}" />
+							</h:selectOneListbox>
+							<p:spacer width="5" height="10"></p:spacer>
+							<p:commandButton update="teacherDetail" oncomplete="PF('teacherOP').show('#{component.clientId}')" icon="ui-icon-search" title="View">
+		            		</p:commandButton>
+		            	</h:panelGrid>
+      				</h:panelGrid>
+      				<p:spacer width="20" height="10"></p:spacer>
+      				<h:panelGrid columns="1">
+      					<h:outputText value="Book: " />
+      					<h:panelGrid columns="3">
+	 						<h:selectOneListbox size="1" id="bookDropdown" 
+	 							valueChangeListener="#{semestercourseBean.onChangeBookitemId}"
+	 							value="#{semestercourseBean.bookitemId}" >
+								<f:selectItems value="#{semestercourseBean.bookitemDropdown}" />
+							</h:selectOneListbox>
+							<p:spacer width="5" height="10"></p:spacer>
+							<p:commandButton update="bookitemDetail" oncomplete="PF('bookitemOP').show('#{component.clientId}')" icon="ui-icon-search" title="View">
+		            		</p:commandButton>
+		            	</h:panelGrid>
+      				</h:panelGrid>
+      			</h:panelGrid>
+      		</h:panelGroup>
+      		<br/>
+      		<h:panelGroup>
+          		<h:panelGrid columns="5">
+          			<h:panelGrid columns="1">
+	          			<h:outputText value="Max Capacity:"/>
+          				<h:inputText id="maxcapacity" converterMessage="Please enter digits only." 
+          					value="#{semestercourseBean.semestercourse.maxcapacity}" > 
+               			</h:inputText>
+                		<p:message for="maxcapacity"></p:message>
+                	</h:panelGrid>
+                	<p:spacer width="10" height="10"></p:spacer>
+                	<h:panelGrid columns="1">
+                		<h:outputText value="Class Fee:" style="font-weight: bold;"/>
+	          			<p:inputNumber id="price" required="true" requiredMessage="Price is required"
+	          				value="#{semestercourseBean.semestercourse.price}" symbol="$" 
+                			minValue="0" emptyValue="sign"> 
+                		</p:inputNumber>
+                		<p:message for="price"></p:message>
+                	</h:panelGrid>
+                	<p:spacer width="10" height="10"></p:spacer>
+                	<h:panelGrid columns="1">
+                		<h:panelGrid columns="2">
+                			<h:outputText value="Discount? " />
+      						<p:selectBooleanCheckbox value="#{semestercourseBean.semestercourse.discountstatus}" >
+        						<p:ajax event="change" update="discountamount" />
+        					</p:selectBooleanCheckbox>
+        				</h:panelGrid>
+        				<h:panelGrid columns="2">
+        					<p:inputNumber id="discountamount" value="#{semestercourseBean.semestercourse.discountamount}" symbol="$" 
+                				disabled="#{!semestercourseBean.semestercourse.discountstatus}" minValue="0" emptyValue="sign"> 
+                			</p:inputNumber>
+                			<p:message for="discountamount"></p:message>
+                		</h:panelGrid>
+                	</h:panelGrid>
+                </h:panelGrid>
+            </h:panelGroup>
+            <br/> 
+            <h:panelGroup>
+                <h:panelGrid columns="1">
+                	<h:panelGrid columns="1" styleClass="dialog">
+	          			<h:outputLabel value="Short Class Syllubus (less than 1000 characters)" style="color:red"/>
+            		</h:panelGrid>
+      				<h:panelGrid columns="1" styleClass="dialog" columnClasses="col1" >
+	          			<p:editor widgetVar="note" value="#{semestercourseBean.semestercourse.note}" 
+	          				height="150" width="500"
+	          				style="margin-bottom:10px" maxlength="400" 
+	          				placeholder="Enter your content">
+			    		</p:editor>
+      				</h:panelGrid>
+      			</h:panelGrid>
+             </h:panelGroup>
+      	  </h:panelGrid>
+      	  
+      	  <p:commandButton id="createSaveButton" value="#{messages.label_save}" 
+      	    process="createForm" action="#{semestercourseBean.persist}" update=":dataForm:data createPanelGrid :growlForm:growl" />
+          <p:commandButton id="createCloseButton" value="#{messages.label_close}" onclick="PF('createDialogWidget').hide()" type="button" />
+          
+		  <p:overlayPanel widgetVar="courseinfoOP" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+		    <p:outputPanel id="courseinfoDetail" style="text-align:center;">
+		      <p:panelGrid  columns="2">
+		        <f:facet name="header">
+		          <h:outputText value="Detail" />
+		        </f:facet>
+		 		<h:outputText value="Id:" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.id}" />
+		 		<h:outputText value="Code" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.coursecode}" />
+		        <h:outputText value="Name" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.coursename}" />
+		        <h:outputText value="Grade" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.coursegrade}" />
+		 	  </p:panelGrid>
+		    </p:outputPanel>
+		  </p:overlayPanel>
+          <p:overlayPanel widgetVar="teacherOP" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+		    <p:outputPanel id="teacherDetail" style="text-align:center;">
+		      <p:panelGrid  columns="2">
+		        <f:facet name="header">
+		          <h:outputText value="Detail" />
+		        </f:facet>
+		 		<h:outputText value="Name:" />
+		        <h:outputText value="#{semestercourseBean.teacher.lastname}, #{semestercourseBean.teacher.firstname}" />
+		 		<h:outputText value="Email:" />
+		        <h:outputText value="#{semestercourseBean.teacher.email}" />
+		        <h:outputText value="Home Phone: " />
+		        <h:outputText value="#{semestercourseBean.teacher.homephone}" />
+		        <h:outputText value="Cell Phone: " />
+		        <h:outputText value="#{semestercourseBean.teacher.cellphone}" />
+		 	  </p:panelGrid>
+		    </p:outputPanel>
+		  </p:overlayPanel>
+		  <p:overlayPanel widgetVar="bookitemOP" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+		    <p:outputPanel id="bookitemDetail" style="text-align:center;">
+		      <p:panelGrid  columns="2">
+		        <f:facet name="header">
+		          <h:outputText value="Detail" />
+		        </f:facet>
+		 		<h:outputText value="Name:" />
+		        <h:outputText value="#{semestercourseBean.bookitem.bookname}" />
+		 		<h:outputText value="Description:" />
+		        <h:outputText value="#{semestercourseBean.bookitem.bookdescription}" />
+		        <h:outputText value="Price: " />
+		        <h:outputText value="#{semestercourseBean.bookitem.bookprice}" />
+		        <h:outputText value="Amount in Stock: " />
+		        <h:outputText value="#{semestercourseBean.bookitem.amountinstock}" />
+		        <h:outputText value="Amount Sold: " />
+		        <h:outputText value="#{semestercourseBean.bookitem.amountsold}" />
+		 	  </p:panelGrid>
+		    </p:outputPanel>
+		  </p:overlayPanel>
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:dialog id="editDialog" header="#{messages.label_edit} Semestercourse" modal="true" widgetVar="editDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":dataForm:data" listener="#{semestercourseBean.handleDialogClose}" />
+      <p:outputPanel id="editPanel">
+        <h:form id="editForm" enctype="multipart/form-data">
+          <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+          	<h:panelGroup>
+          		<h:panelGrid columns="3" styleClass="dialog">
+	          		<h:panelGrid columns="1">
+		          		<h:outputText value="Class Code:" style="font-weight: bold;"/>
+		          		<h:inputText id="semestercoursecodeedit" required="true" requiredMessage="Classs code is required"
+		          			value="#{semestercourseBean.semestercourse.semestercoursecode}" />
+		          		<p:watermark for="semestercoursecodeedit" value="required, ex CHN-**" />
+		      			<p:message for="semestercoursecodeedit"></p:message>
+		          	</h:panelGrid>
+		          	<p:spacer width="10" height="10"></p:spacer>
+		          	<h:panelGrid columns="1">
+      					<h:outputText value="Class For: " />
+      					<h:panelGrid columns="3">
+		 					<h:selectOneListbox size="1" id="courseDropdownedit"
+		 						valueChangeListener="#{semestercourseBean.onChangeCourseinfoId}"
+		 						value="#{semestercourseBean.courseinfoId}" >
+								<f:selectItems value="#{semestercourseBean.courseinfoDropdown}" />
+							</h:selectOneListbox>
+							<p:spacer width="5" height="10"></p:spacer>
+							<p:commandButton update="courseinfoDetailedit" oncomplete="PF('courseinfoOPedit').show('#{component.clientId}')" icon="ui-icon-search" title="View">
+	            			</p:commandButton>
+            			</h:panelGrid>
+      				</h:panelGrid>
+            	</h:panelGrid>
+      		</h:panelGroup>
+      		<br/>
+      		<h:panelGroup>
+          		<h:panelGrid columns="5" styleClass="dialog">
+	          		<h:panelGrid columns="1">
+		          		<h:outputText value="Room:" style="font-weight: bold;"/>
+		          		<h:inputText id="roomedit" required="true" requiredMessage="Room is required"
+		          			value="#{semestercourseBean.semestercourse.room}" />
+		          		<p:watermark for="roomedit" value="Required" />
+		          		<p:message for="roomedit"></p:message>
+		          	</h:panelGrid>
+		          	<p:spacer width="10" height="10"></p:spacer>
+	          		<h:panelGrid columns="1">
+	          			<h:outputText value="Start time:"/>
+	          			<h:selectOneListbox size="1" id="starttimeedit"
+		 					value="#{semestercourseBean.semestercourse.starttime}" >
+							<f:selectItem itemValue="12:00" itemLabel="12:00"/>
+							<f:selectItem itemValue="13:00" itemLabel="13:00"/>
+							<f:selectItem itemValue="14:00" itemLabel="14:00"/>
+							<f:selectItem itemValue="15:00" itemLabel="15:00"/>
+							<f:selectItem itemValue="16:00" itemLabel="16:00"/>
+						</h:selectOneListbox>
+	          		</h:panelGrid>
+	          		<p:spacer width="10" height="10"></p:spacer>
+	          		<h:panelGrid>
+	          			<h:outputText value="End time:"/>
+	          			<h:selectOneListbox size="1" id="endtimeedit"
+		 					value="#{semestercourseBean.semestercourse.endtime}" >
+							<f:selectItem itemValue="12:50" itemLabel="12:50"/>
+							<f:selectItem itemValue="13:50" itemLabel="13:50"/>
+							<f:selectItem itemValue="14:50" itemLabel="14:50"/>
+							<f:selectItem itemValue="15:50" itemLabel="15:50"/>
+							<f:selectItem itemValue="16:50" itemLabel="16:50"/>
+						</h:selectOneListbox>
+      				</h:panelGrid>
+            	</h:panelGrid>
+      		</h:panelGroup>
+      		<br/>
+      		<h:panelGroup>
+          		<h:panelGrid columns="3">
+          			<h:panelGrid columns="1">
+      					<h:outputText value="Teacher: " />
+      					<h:panelGrid columns="3">
+		 					<h:selectOneListbox size="1" id="teacherDropdownedit" 
+		 						valueChangeListener="#{semestercourseBean.onChangeTeacherId}"
+		 						value="#{semestercourseBean.teacherId}" >
+								<f:selectItems value="#{semestercourseBean.teacherDropdown}" />
+							</h:selectOneListbox>
+							<p:spacer width="5" height="10"></p:spacer>
+							<p:commandButton update="teacherDetailedit" oncomplete="PF('teacherOPedit').show('#{component.clientId}')" icon="ui-icon-search" title="View">
+		            		</p:commandButton>
+		            	</h:panelGrid>
+      				</h:panelGrid>
+      				<p:spacer width="20" height="10"></p:spacer>
+      				<h:panelGrid columns="1">
+      					<h:outputText value="Book: " />
+      					<h:panelGrid columns="3">
+	 						<h:selectOneListbox size="1" id="bookDropdownedit" 
+	 							valueChangeListener="#{semestercourseBean.onChangeBookitemId}"
+	 							value="#{semestercourseBean.bookitemId}" >
+								<f:selectItems value="#{semestercourseBean.bookitemDropdown}" />
+							</h:selectOneListbox>
+							<p:spacer width="5" height="10"></p:spacer>
+							<p:commandButton update="bookitemDetailedit" oncomplete="PF('bookitemOPedit').show('#{component.clientId}')" icon="ui-icon-search" title="View">
+		            		</p:commandButton>
+		            	</h:panelGrid>
+      				</h:panelGrid>
+      			</h:panelGrid>
+      		</h:panelGroup>
+      		<br/>
+      		<h:panelGroup>
+          		<h:panelGrid columns="5">
+          			<h:panelGrid columns="1">
+	          			<h:outputText value="Max Capacity:"/>
+          				<h:inputText id="maxcapacityedit" converterMessage="Please enter digits only." 
+          					value="#{semestercourseBean.semestercourse.maxcapacity}" > 
+               			</h:inputText>
+                		<p:message for="maxcapacityedit"></p:message>
+                	</h:panelGrid>
+                	<p:spacer width="10" height="10"></p:spacer>
+                	<h:panelGrid columns="1">
+                		<h:outputText value="Class Fee:" style="font-weight: bold;"/>
+	          			<p:inputNumber id="priceedit" required="true" requiredMessage="Price is required"
+	          				value="#{semestercourseBean.semestercourse.price}" symbol="$" 
+                			minValue="0" emptyValue="sign"> 
+                		</p:inputNumber>
+                		<p:message for="priceedit"></p:message>
+                	</h:panelGrid>
+                	<p:spacer width="10" height="10"></p:spacer>
+                	<h:panelGrid columns="1">
+                		<h:panelGrid columns="2">
+                			<h:outputText value="Discount? " />
+      						<p:selectBooleanCheckbox value="#{semestercourseBean.semestercourse.discountstatus}" >
+        						<p:ajax event="change" update="discountamountedit" />
+        					</p:selectBooleanCheckbox>
+        				</h:panelGrid>
+        				<h:panelGrid columns="2">
+        					<p:inputNumber id="discountamountedit" value="#{semestercourseBean.semestercourse.discountamount}" symbol="$" 
+                				disabled="#{!semestercourseBean.semestercourse.discountstatus}" minValue="0" emptyValue="sign"> 
+                			</p:inputNumber>
+                			<p:message for="discountamountedit"></p:message>
+                		</h:panelGrid>
+                	</h:panelGrid>
+                </h:panelGrid>
+            </h:panelGroup>
+            <br/> 
+            <h:panelGroup>
+                <h:panelGrid columns="1">
+                	<h:panelGrid columns="1" styleClass="dialog">
+	          			<h:outputLabel value="Short Class Syllubus (less than 1000 characters)" style="color:red"/>
+            		</h:panelGrid>
+      				<h:panelGrid columns="1" styleClass="dialog" columnClasses="col1" >
+	          			<p:editor widgetVar="noteedit" value="#{semestercourseBean.semestercourse.note}" 
+	          				height="150" width="500"
+	          				style="margin-bottom:10px" maxlength="400" 
+	          				placeholder="Enter your content">
+			    		</p:editor>
+      				</h:panelGrid>
+      			</h:panelGrid>
+             </h:panelGroup>
+             
+             
+             
+             
+             
+             
+      		
+      	  </h:panelGrid>
+          <p:commandButton id="editSaveButton" value="#{messages.label_save}" 
+          	process="editForm" action="#{semestercourseBean.persist}" update=":dataForm:data editPanelGrid :growlForm:growl" />
+          <p:commandButton id="editCloseButton" value="#{messages.label_close}" onclick="PF('editDialogWidget').hide()" type="button" />
+          
+		  <p:overlayPanel widgetVar="courseinfoOPedit" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+		    <p:outputPanel id="courseinfoDetailedit" style="text-align:center;">
+		      <p:panelGrid  columns="2">
+		        <f:facet name="header">
+		          <h:outputText value="Detail" />
+		        </f:facet>
+		 		<h:outputText value="Id:" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.id}" />
+		 		<h:outputText value="Code" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.coursecode}" />
+		        <h:outputText value="Name" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.coursename}" />
+		        <h:outputText value="Grade" />
+		        <h:outputText value="#{semestercourseBean.courseinfo.coursegrade}" />
+		 	  </p:panelGrid>
+		    </p:outputPanel>
+		  </p:overlayPanel>
+          <p:overlayPanel widgetVar="teacherOPedit" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+		    <p:outputPanel id="teacherDetailedit" style="text-align:center;">
+		      <p:panelGrid  columns="2">
+		        <f:facet name="header">
+		          <h:outputText value="Detail" />
+		        </f:facet>
+		 		<h:outputText value="Name:" />
+		        <h:outputText value="#{semestercourseBean.teacher.lastname}, #{semestercourseBean.teacher.firstname}" />
+		 		<h:outputText value="Email:" />
+		        <h:outputText value="#{semestercourseBean.teacher.email}" />
+		        <h:outputText value="Home Phone: " />
+		        <h:outputText value="#{semestercourseBean.teacher.homephone}" />
+		        <h:outputText value="Cell Phone: " />
+		        <h:outputText value="#{semestercourseBean.teacher.cellphone}" />
+		 	  </p:panelGrid>
+		    </p:outputPanel>
+		  </p:overlayPanel>
+		  <p:overlayPanel widgetVar="bookitemOPedit" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+		    <p:outputPanel id="bookitemDetailedit" style="text-align:center;">
+		      <p:panelGrid  columns="2">
+		        <f:facet name="header">
+		          <h:outputText value="Detail" />
+		        </f:facet>
+		 		<h:outputText value="Name:" />
+		        <h:outputText value="#{semestercourseBean.bookitem.bookname}" />
+		 		<h:outputText value="Description:" />
+		        <h:outputText value="#{semestercourseBean.bookitem.bookdescription}" />
+		        <h:outputText value="Price: " />
+		        <h:outputText value="#{semestercourseBean.bookitem.bookprice}" />
+		        <h:outputText value="Amount in Stock: " />
+		        <h:outputText value="#{semestercourseBean.bookitem.amountinstock}" />
+		        <h:outputText value="Amount Sold: " />
+		        <h:outputText value="#{semestercourseBean.bookitem.amountsold}" />
+		 	  </p:panelGrid>
+		    </p:outputPanel>
+		  </p:overlayPanel>
+		  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    <p:confirmDialog id="deactivateDialog" widgetVar="deactivateDialogWidget" message="#{messages.label_deactivate_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deactivation}" severity="alarm">
+      <p:outputPanel id="deactivatePanel">
+        <h:form id="deactivateForm">
+          <p:commandButton id="deactivateYesButton" value="#{messages.label_yes}" action="#{semestercourseBean.deactivateSemestercourse}" update=":dataForm:data :growlForm:growl" oncomplete="PF('deactivateDialogWidget').hide()" />
+          <p:commandButton id="deactivateNoButton" value="#{messages.label_no}" onclick="PF('deactivateDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:confirmDialog>
+  </ui:define>
+</ui:composition>
+</html>

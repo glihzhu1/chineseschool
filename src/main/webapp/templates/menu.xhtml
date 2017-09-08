@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+  <h:form prependId="false" id="growlForm">
+    <p:growl id="growl" showDetail="true" />
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    
+     
+  </h:form>
+
+  <form action="${request.contextPath}/j_spring_security_logout" method="post" id="logoutForm">
+     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  </form>
+  <script>
+    function formSubmit() {
+      document.getElementById("logoutForm").submit();
+    }
+  </script>
+
+
+  <h:panelGrid cellspacing="0" cellpadding="0" styleClass="content">
+   
+    <p:megaMenu orientation="horizontal" style="margin-top:1px">
+      <p:menuitem value="Home" outcome="/pages/admin/main" icon="ui-icon-star"/>
+      
+  	  <p:submenu label="Family/Personnel" icon="ui-icon-check">
+        <p:column>
+          <p:menu model="#{applicationBean.menuModel}" style="width:198px" />
+        </p:column>
+      </p:submenu>
+      
+      <p:submenu label="Tasks" icon="ui-icon-check">
+        <p:column>
+          <p:menu model="#{applicationBean.taskMenuModel}" style="width:198px" />
+        </p:column>
+      </p:submenu>
+      
+      <p:submenu label="Classes" icon="ui-icon-check">
+        <p:column>
+          <p:menu model="#{applicationBean.classMenuModel}" style="width:198px" />
+        </p:column>
+      </p:submenu>
+      
+	  <p:menuitem value="Logout: #{applicationBean.userDetails.username}" icon="ui-icon-close" 
+    	rendered="#{applicationBean.userDetails != null}" 
+	 	onclick="javascript:formSubmit()"/>
+    </p:megaMenu>
+    
+    
+  </h:panelGrid>
+  
+
+</ui:composition>
+</html>

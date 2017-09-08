@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <ui:composition>
+        <p:ajaxStatus id="ajaxStatus">
+            <f:facet name="start">
+<!--                    
+                <p:outputPanel layout="block" style="z-index:9999; position: absolute; top: 15px; left: 94%;">
+                    <p:graphicImage value="/resources/images/loading3.gif" />
+                </p:outputPanel>
+-->                    
+                <p:outputPanel id="_ajax_status_indicator" layout="block" 
+                	style="z-index:9999; position: absolute; top: 120px; left: 30%;">
+                    <h:outputText style="font-weight:bold; color: red" value="Loading and managing data, please wait..." />
+                </p:outputPanel>
+            </f:facet>
+
+            <f:facet name="error">
+                <p:outputPanel layout="block" style="text-align: center !important;">
+                    <h:outputText value="Your session most likely ended. Please close browser tab or window, reopen the web application, or click to " />
+                    <h:link value="restart." outcome="/index.xhtml?faces-redirect=true" />
+                </p:outputPanel>
+            </f:facet>
+
+            <f:facet name="complete">
+
+            </f:facet>
+        </p:ajaxStatus>
+        
+    </ui:composition>
+    
+</html>

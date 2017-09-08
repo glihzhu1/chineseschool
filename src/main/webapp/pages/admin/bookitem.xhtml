@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/layout.xhtml">
+  <ui:define name="content">
+    <h:form prependId="false" id="growlForm">
+      <p:growl id="growl" showDetail="false" />
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    <h:form prependId="false" id="dataForm">
+      <p:panel id="data" toggleable="true" toggleSpeed="250">
+        <p:dataTable id="list" value="#{bookitemBean.allBookitems}" rowKey="#{bookitem.id}"
+                 selection="#{bookitemBean.bookitem}" selectionMode="single" 
+        var="bookitem" rendered="#{not empty bookitemBean.allBookitems}" resizableColumns="true" 
+        filteredValue="#{bookitemBean.filteredBookitems}" widgetVar="bookitemsTable"
+        paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
+
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search Bookitems:" />
+					<h:inputText id="globalFilter"
+						onkeyup="PF('bookitemsTable').filter()" />
+				</p:outputPanel>
+			</f:facet>
+
+			<p:column headerText="Book Code" sortBy="#{bookitem.bookcode}" 
+        		 filterMatchMode="contains" filterBy="#{bookitem.bookcode}">
+            	<h:outputText value="#{bookitem.bookcode}" />
+           	</p:column>
+       		
+			<p:column headerText="Description" sortBy="#{bookitem.bookdescription}" 
+        		 filterMatchMode="contains" filterBy="#{bookitem.bookdescription}">
+            	<h:outputText value="#{bookitem.bookdescription}" />
+           	</p:column>
+       		<p:column headerText="Status">
+            	<h:outputText value="#{bookitem.active? 'Active' : 'Inactive'}" style="font-weight: bold; color: red;"/>
+       		</p:column>
+       		
+        	
+        	<p:column styleClass="action-column">
+            <f:facet name="header">
+              <h:outputText value="Actions" />
+            </f:facet>
+            
+            <p:commandButton id="editButton" icon="fa fa-fw fa-edit" update=":editForm:editPanelGrid" 
+              action="#{bookitemBean.onEdit}" oncomplete="PF('editDialogWidget').show()" title="#{messages.label_edit}">
+              <f:setPropertyActionListener value="#{bookitem}" target="#{bookitemBean.bookitem}" />
+            </p:commandButton>
+            <p:tooltip for="editButton" position="top" value="#{messages.label_edit} bookitem" showEffect="fade" hideEffect="fade" />
+            
+            <p:commandButton id="deactivateButton" icon="fa fa-fw fa-close" rendered="#{bookitem.active}"
+            	oncomplete="PF('deactivateDialogWidget').show()" title="#{messages.label_deactivate}">
+              <f:setPropertyActionListener value="#{bookitem}" target="#{bookitemBean.bookitem}" />
+            </p:commandButton>
+            <p:tooltip for="deactivateButton" position="top" value="Deactivate" showEffect="fade" hideEffect="fade" />
+          </p:column>
+        </p:dataTable>
+      </p:panel>
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    <p:dialog id="createDialog" header="#{messages.label_create} Bookitem" modal="true" widgetVar="createDialogWidget" dynamic="true" visible="#{bookitemBean.createDialogVisible}" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":dataForm:data" listener="#{bookitemBean.handleDialogClose}" />
+      <p:outputPanel id="createPanel">
+        <h:form id="createForm" enctype="multipart/form-data">
+          <h:panelGrid id="createPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+          	<h:panelGrid columns="7" styleClass="dialog">
+          		<h:outputText value="Book Code"/>
+	          	<h:inputText id="bookcode" required="true" requiredMessage="Bookitem name is required"
+	          		value="#{bookitemBean.bookitem.bookcode}" />
+	          	<p:message for="bookcode"></p:message>
+	          	<p:spacer width="10" height="10"></p:spacer>
+	          	<h:outputText value="Book Description:"/>
+	          	<h:inputText id="bookitemDescription" required="true" requiredMessage="Bookitem name is required"
+	          		value="#{bookitemBean.bookitem.bookdescription}" />
+	          	<p:message for="bookitemDescription"></p:message>
+            </h:panelGrid>
+            
+            <h:panelGrid columns="6" styleClass="dialog">
+          		<h:outputText value="Book Name:"/>
+	          	<h:inputText id="bookitemname" required="true" requiredMessage="Bookitem name is required"
+	          		value="#{bookitemBean.bookitem.bookname}" />
+	          	<p:message for="bookitemname"></p:message>
+	          	<p:spacer width="10" height="10"></p:spacer>
+	          	<h:outputText value="Book Chinese Name:"/>
+	          	<h:inputText value="#{bookitemBean.bookitem.bookchinesename}" />
+            </h:panelGrid>
+               
+            <h:panelGrid columns="7" styleClass="dialog">
+	          	<h:outputText value="Book price:"/>
+	          	<p:inputNumber id="bookprice" value="#{bookitemBean.bookitem.bookprice}" symbol="$" 
+                	minValue="0" emptyValue="sign"> 
+                </p:inputNumber>
+                <p:message for="bookprice"></p:message>
+                <p:spacer width="10" height="10"></p:spacer>
+                <h:outputText value="Book discount price:"/>
+	          	<p:inputNumber id="bookdiscountprice" value="#{bookitemBean.bookitem.bookdiscountprice}" symbol="$" 
+                	minValue="0" emptyValue="sign">
+                </p:inputNumber>
+                <p:message for="bookdiscountprice"></p:message>
+      		</h:panelGrid>
+      		
+      		 <h:panelGrid columns="7" styleClass="dialog">
+	          	<h:outputText value="Number Sold:"/>
+          		<h:inputText id="amountsold" converterMessage="Please enter digits only." 
+          			value="#{bookitemBean.bookitem.amountsold}" > 
+               	</h:inputText>
+                <p:message for="amountsold"></p:message>
+                <p:spacer width="10" height="10"></p:spacer>
+                <h:outputText value="Number in stock:"/>
+	          	<h:inputText id="amountinstock" converterMessage="Please enter digits only." 
+	          		value="#{bookitemBean.bookitem.amountinstock}">
+                </h:inputText>
+                <p:message for="amountinstock"></p:message>
+      		</h:panelGrid>
+      		
+      		
+      	  </h:panelGrid>
+      	  
+      	  <p:commandButton id="createSaveButton" value="#{messages.label_save}" 
+      	    process="createForm" action="#{bookitemBean.persist}" update=":dataForm:data createPanelGrid :growlForm:growl" />
+          <p:commandButton id="createCloseButton" value="#{messages.label_close}" onclick="PF('createDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:dialog id="editDialog" header="#{messages.label_edit} Bookitem" modal="true" widgetVar="editDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":dataForm:data" listener="#{bookitemBean.handleDialogClose}" />
+      <p:outputPanel id="editPanel">
+        <h:form id="editForm" enctype="multipart/form-data">
+          <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+          	<h:panelGrid columns="10" styleClass="dialog">
+          		<h:outputText value="Book Code"/>
+	          	<h:inputText id="bookcodeedit" required="true" requiredMessage="Bookitem name is required"
+	          		value="#{bookitemBean.bookitem.bookcode}" />
+	          	<p:message for="bookcodeedit"></p:message>
+	          	<p:spacer width="10" height="10"></p:spacer>
+	          	
+	          	<h:outputText value="Active? " />
+      			<p:spacer width="10" height="10"></p:spacer>
+        		<p:selectBooleanCheckbox value="#{bookitemBean.bookitem.active}" />
+        
+	          	<h:outputText value="Book Description:"/>
+	          	<h:inputText id="bookitemDescriptionedit" required="true" requiredMessage="Bookitem name is required"
+	          		value="#{bookitemBean.bookitem.bookdescription}" />
+	          	<p:message for="bookitemDescriptionedit"></p:message>
+            </h:panelGrid>
+            
+            <h:panelGrid columns="6" styleClass="dialog">
+          		<h:outputText value="Book Name:"/>
+	          	<h:inputText id="bookitemnameedit" required="true" requiredMessage="Bookitem name is required"
+	          		value="#{bookitemBean.bookitem.bookname}" />
+	          	<p:message for="bookitemnameedit"></p:message>
+	          	<p:spacer width="10" height="10"></p:spacer>
+	          	<h:outputText value="Book Chinese Name:"/>
+	          	<h:inputText value="#{bookitemBean.bookitem.bookchinesename}" />
+            </h:panelGrid>
+               
+            <h:panelGrid columns="7" styleClass="dialog">
+	          	<h:outputText value="Book price:"/>
+	          	<p:inputNumber id="bookpriceedit" value="#{bookitemBean.bookitem.bookprice}" symbol="$" 
+                	minValue="0" emptyValue="sign"> 
+                </p:inputNumber>
+                <p:message for="bookpriceedit"></p:message>
+                <p:spacer width="10" height="10"></p:spacer>
+                <h:outputText value="Book discount price:"/>
+	          	<p:inputNumber id="bookdiscountpriceedit" value="#{bookitemBean.bookitem.bookdiscountprice}" symbol="$" 
+                	minValue="0" emptyValue="sign">
+                </p:inputNumber>
+                <p:message for="bookdiscountpriceedit"></p:message>
+      		</h:panelGrid>
+      		
+      		 <h:panelGrid columns="7" styleClass="dialog">
+	          	<h:outputText value="Number Sold:"/>
+	          	<h:inputText id="amountsoldedit" converterMessage="Please enter digits only." 
+	          		value="#{bookitemBean.bookitem.amountsold}" > 
+                </h:inputText>
+                <p:message for="amountsoldedit"></p:message>
+                <p:spacer width="10" height="10"></p:spacer>
+                <h:outputText value="Number in stock:"/>
+	          	<h:inputText id="amountinstockedit" converterMessage="Please enter digits only." 
+	          		value="#{bookitemBean.bookitem.amountinstock}">
+                </h:inputText>
+                <p:message for="amountinstockedit"></p:message>
+      		</h:panelGrid>
+      		
+      	  </h:panelGrid>
+          <p:commandButton id="editSaveButton" value="#{messages.label_save}" 
+          	process="editForm" action="#{bookitemBean.persist}" update=":dataForm:data editPanelGrid :growlForm:growl" />
+          <p:commandButton id="editCloseButton" value="#{messages.label_close}" onclick="PF('editDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:confirmDialog id="deactivateDialog" widgetVar="deactivateDialogWidget" message="#{messages.label_deactivate_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deactivation}" severity="alarm">
+      <p:outputPanel id="deactivatePanel">
+        <h:form id="deactivateForm">
+          <p:commandButton id="deactivateYesButton" value="#{messages.label_yes}" action="#{bookitemBean.deactivateBookitem}" update=":dataForm:data :growlForm:growl" oncomplete="PF('deactivateDialogWidget').hide()" />
+          <p:commandButton id="deactivateNoButton" value="#{messages.label_no}" onclick="PF('deactivateDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:confirmDialog>
+  </ui:define>
+</ui:composition>
+</html>

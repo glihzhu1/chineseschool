@@ -1,0 +1,41 @@
+<ui:composition template="/templates/layout.xhtml"
+		xmlns="http://www.w3.org/1999/xhtml"
+		xmlns:ui="http://java.sun.com/jsf/facelets"
+		xmlns:f="http://java.sun.com/jsf/core"
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:p="http://primefaces.org/ui" >
+		.
+  <ui:define name="content">
+      <div align="center">
+    	<h4>Please login here:</h4>
+        <h:form id="loginForm">
+        <h:panelGrid id="loginPanelGrid" columns="1" 
+        	style="margin: 0 auto;" styleClass="dialog" columnClasses="col1,col1" >
+          	
+          	<h:inputText id="username" requiredMessage="Username is required"
+            	value="#{applicationBean.username}" required="true"/>
+            <p:watermark for="username" value="Username" id="watermarkUsername" />
+            <p:message for="username"></p:message>
+            
+            <p:spacer width="10" height="10"></p:spacer>
+            
+            <h:inputSecret requiredMessage="Password is required" id="password"
+            	value="#{applicationBean.password}" required="true">
+        	</h:inputSecret>
+        	<p:watermark for="password" value="Password" id="watermarkPassword" />
+        	<p:message for="password"></p:message>
+        	
+            <p:spacer width="10" height="5"></p:spacer>
+            
+            <h:panelGroup>
+            <h:panelGrid columns="1">
+            	<p:commandButton id="loginButton" value="Login" action="#{applicationBean.login}" 
+            		update="loginPanelGrid" />
+            </h:panelGrid>
+            </h:panelGroup>
+          </h:panelGrid>
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>  
+        </h:form>
+       </div>
+</ui:define>
+</ui:composition>
