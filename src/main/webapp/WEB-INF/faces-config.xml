@@ -17,6 +17,6 @@
         </locale-config>
     </application>
     <factory>
-        <exception-handler-factory>com.xilin.management.school.web.util.ViewExpiredExceptionExceptionHandlerFactory</exception-handler-factory>
+        <exception-handler-factory>com.xilin.management.school.web.util.CustomExceptionHandlerFactory</exception-handler-factory>
     </factory>
 </faces-config>

@@ -7,9 +7,10 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="Dali", date="2017-09-06T16:43:10.447-0500")
+@Generated(value="Dali", date="2017-09-07T21:28:26.327-0500")
 @StaticMetamodel(Semester.class)
 public class Semester_ {
+	public static volatile SetAttribute<Semester, Familytransaction> familytransactions;
 	public static volatile SetAttribute<Semester, Familybilling> familybillings;
 	public static volatile SetAttribute<Semester, Registration> registrations;
 	public static volatile SetAttribute<Semester, Semestercourse> semestercourses;
@@ -32,5 +33,4 @@ public class Semester_ {
 	public static volatile SingularAttribute<Semester, BigDecimal> podrefundamount;
 	public static volatile SingularAttribute<Semester, BigDecimal> returnedcheckfee;
 	public static volatile SingularAttribute<Semester, Integer> id;
-	public static volatile SetAttribute<Semester, Familytransaction> familytransactions;
 }

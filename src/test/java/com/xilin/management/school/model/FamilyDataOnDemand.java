@@ -46,6 +46,7 @@ public class FamilyDataOnDemand {
         setUpdatedtime(obj, index);
         setXilinemail(obj, index);
         setZip(obj, index);
+        setLoginId(obj, index);
         return obj;
     }
 
@@ -213,6 +214,14 @@ public class FamilyDataOnDemand {
         obj.setZip(zip);
     }
 
+	public void setLoginId(Family obj, int index) {
+        String loginId = "loginId_" + index;
+        if (loginId.length() > 40) {
+        	loginId = loginId.substring(0, 40);
+        }
+        obj.setLoginId(loginId);
+    }
+	
 	public Family getSpecificFamily(int index) {
         init();
         if (index < 0) {

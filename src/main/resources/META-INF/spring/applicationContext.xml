@@ -71,4 +71,6 @@
     <bean class="org.springframework.mail.javamail.JavaMailSenderImpl" id="mailSender">
         <property name="host" value="${email.host}"/>
     </bean>
+    <bean id="persistenceExceptionTranslationPostProcessor"
+   		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 </beans>

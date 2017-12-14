@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+	<p:dataTable var="student" value="#{familyBean.selectedStudents}" 
+		emptyMessage="no students found for the family" rowKey="#{student.id}" 
+	             selection="#{familyBean.student}" selectionMode="single"
+	             style="width:800px;">
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Student ID -Status" style="color: blue"></h:outputText>
+			</f:facet>
+			<h:outputText value="#{student.id}" />
+			<h:outputText value="#{student.active? ' -A' : ' -I'}" style="font-weight: bold; color: red;"/>
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Name" style="color: blue"></h:outputText>
+			</f:facet>
+			<h:outputText value="#{student.firstname} #{student.lastname}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Chinese Name" style="color: blue"></h:outputText>
+			</f:facet>
+			<h:outputText value="#{student.chinesename}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Birth Date" style="color: blue"></h:outputText>
+			</f:facet>
+			<h:outputText value="#{student.dob.time}" >
+				<f:convertDateTime pattern="MM/dd/yyyy" type="date"/>
+			</h:outputText>
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Gender" style="color: blue"></h:outputText>
+			</f:facet>
+			<h:outputText value="#{student.gender}" />
+		</p:column>
+		<p:column styleClass="action-column">
+	          <f:facet name="header">
+	            <h:outputText value="Actions" style="color: blue"/>
+	          </f:facet>
+	          <p:commandButton id="registerButton" icon="fa fa-fw fa-shopping-cart" 
+	            action="#{familyBean.onRegisterStudent}" title="Register Class" 
+	            update="regiterStudentDialog" 
+	            oncomplete="PF('regiterStudentDialogWidget').show();"
+	            rendered="#{student.active}">
+	            <f:setPropertyActionListener value="#{student}" target="#{familyBean.student}" />
+	          </p:commandButton>
+	          <p:tooltip for="registerButton" position="top" value="Register Class" showEffect="fade" hideEffect="fade" />
+	        
+	          <p:commandButton id="editStudentButton" icon="fa fa-fw fa-edit" action="#{familyBean.onEditStudent}"
+	         		update=":editStudentForm:editStudentPanelGrid" oncomplete="PF('editStudentDialogWidget').show()" title="#{messages.label_edit}">
+	           	  <f:setPropertyActionListener value="#{student}" target="#{familyBean.student}" />
+	          </p:commandButton>
+	          <p:tooltip for="editStudentButton" position="top" value="#{messages.label_edit} Student" showEffect="fade" hideEffect="fade" />
+	         
+	          
+	         	
+	        </p:column>
+	    </p:dataTable>
+	    
+	
+</ui:composition>

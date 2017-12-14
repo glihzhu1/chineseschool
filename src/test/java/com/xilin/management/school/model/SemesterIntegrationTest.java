@@ -69,6 +69,14 @@ public class SemesterIntegrationTest {
     }
 
 	@Test
+    public void testFindFirstByOrderByRegisterstartdateDesc() {
+        //List<Semester> result = semesterRepository.findAll(new org.springframework.data.domain.PageRequest(firstResult / maxResults, maxResults)).getContent();
+		Semester result = semesterRepository.findFirstByOrderByRegisterstartdateDesc();
+        Assert.assertNotNull("Find entries method for 'Semester' illegally returned null", result);
+        //Assert.assertEquals("Find entries method for 'Semester' returned an incorrect number of entries", count, result.size());
+    }
+	
+	@Test
     public void testSave() {
         Assert.assertNotNull("Data on demand for 'Semester' failed to initialize correctly", dod.getRandomSemester());
         Semester obj = dod.getNewTransientSemester(Integer.MAX_VALUE);

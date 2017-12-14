@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+<ui:composition template="/templates/layout.xhtml">
+  <ui:define name="content">
+    <p:panel id="mainPanel" toggleable="true" toggleSpeed="250">
+      <f:facet name="header">
+        <h:outputFormat value="#{messages.label_welcome_titlepane}">
+          <f:param value="#{applicationBean.appName}" />
+        </h:outputFormat>
+      </f:facet>
+      <p />
+      <h:outputText id="welcomeText" value="Familyyyy #{messages.label_welcome_text}" />
+      <br/>
+      <div id="media" style="height:200px">
+        <h:form prependId="false" id="mainForm">
+	      <p:dashboard id="board" model="#{familyBean.boardModel}">
+	        <p:panel id="actions" header="Actions" style="width=300px; height:150px;">
+	            <p:commandLink value="My Family Payments" action="#{familyBean.queryFamilyInfoAndProcessPayment}"
+	              oncomplete="PF('processPaymentDialogWidget').show()"
+	              update="processPaymentDialog" />
+	            <br/>
+	            <p:commandLink value="Reserve POD(Parent on Duty)" action="#{familyBean.queryFamilyInfoAndReservePod}"
+	              oncomplete="PF('reservePodDialogWidget').show()"
+	              update="reservePodDialog" />
+	            <br/>
+	            <p:commandLink value="Add New Student" action="#{familyBean.queryFamilyInfoAndAddStudent}"
+	              oncomplete="PF('addStudentWidget').show()" 
+	              update=":addStudentForm:addStudentPanelGrid" />
+	            <br/>
+	            <p:commandLink value="My Family Book Orders" action="#{familyBean.queryFamilyInfoAndManagebooks}"
+	              oncomplete="PF('orderbookDialogWidget').show()"
+	              update="orderbookDialog" />
+	            <br/>
+	          
+	        </p:panel>
+	        
+	        <p:panel id="accountSetting" header="Account Setting" style="width=300px; height:150px;">
+	            <p:commandLink value="Edit Family Information" action="#{familyBean.queryFamilyInfo}"
+	              oncomplete="PF('editDialogWidget').show()" 
+	              update=":editForm:editPanelGrid" />
+	            <br/>
+	            <p:commandLink value="View Family Information" action="#{familyBean.queryFamilyInfo}"
+	              oncomplete="PF('viewDialogWidget').show()" 
+	              update=":viewForm:viewPanelGrid" />
+	            <br/>
+	            <p:commandLink value="Change Family Password" action="#{familyBean.queryFamilyInfo}"
+	              oncomplete="PF('changePasswordDialogWidget').show()" 
+	              update=":changePasswordForm:changePasswordPanelGrid" />
+	        </p:panel>
+	      </p:dashboard>
+	      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	    </h:form>
+      </div>
+    </p:panel>
+    
+    <h:outputText value="Listed below are all the students in your family:" 
+      style="font-size: 20px; color: blue"/>
+    <ui:include src="../include/familystudents.xhtml" />
+      
+    <ui:include src="../include/familyactiondialogs.xhtml" />
+    
+      
+  </ui:define>
+</ui:composition>
+</html>

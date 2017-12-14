@@ -1,7 +1,9 @@
 package com.xilin.management.school.model;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +13,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,7 +23,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(schema = "public",name = "semester")
 public class Semester {
-
+//a comment
 	@OneToMany(mappedBy = "semesterid")
     private Set<Familytransaction> familytransactions;
 
@@ -104,7 +108,8 @@ public class Semester {
 	@Column(name = "returnedcheckfee", precision = 131089)
     private BigDecimal returnedcheckfee;
 
-	
+	@Transient
+	private boolean passed;
 
 	public Set<Familytransaction> getFamilytransactions() {
 		return familytransactions;
@@ -283,6 +288,15 @@ public class Semester {
         this.returnedcheckfee = returnedcheckfee;
     }
 
+	public boolean isPassed() {
+		Calendar today = GregorianCalendar.getInstance();
+		return today.compareTo(this.getEnddate()) > 0 ? true : false;
+	}
+
+	public void setPassed(boolean passed) {
+		this.passed = passed;
+	}
+	
 	public String toString() {
         return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).setExcludeFieldNames("familytransactions", "familybillings", "registrations", "semestercourses", "semesterweeks").toString();
     }

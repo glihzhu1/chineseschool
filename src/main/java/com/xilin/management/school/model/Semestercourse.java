@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -96,6 +97,12 @@ public class Semestercourse {
 	@Column(name = "updatedby", length = 40)
     private String updatedby;
 
+	@Transient
+	boolean selected;
+	
+	@Transient
+	boolean selectedbook;
+	
 	public Bookitem getBookitemid() {
         return bookitemid;
     }
@@ -265,4 +272,21 @@ public class Semestercourse {
 	public void setId(Integer id) {
         this.id = id;
     }
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public boolean isSelectedbook() {
+		return selectedbook;
+	}
+
+	public void setSelectedbook(boolean selectedbook) {
+		this.selectedbook = selectedbook;
+	}
+	
 }

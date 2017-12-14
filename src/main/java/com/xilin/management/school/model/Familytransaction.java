@@ -1,5 +1,7 @@
 package com.xilin.management.school.model;
+import java.math.BigDecimal;
 import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,10 +12,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.xilin.management.school.web.util.Utils;
 
 @Entity
 @Table(schema = "public",name = "familytransaction")
@@ -83,6 +89,12 @@ public class Familytransaction {
 	
 	@Column(name = "transactiontype", length = 20)
     private String transactiontype;
+	
+	@Transient
+	boolean selectedbook;
+	
+	@Transient
+	BigDecimal fee;
 	
 	public Bookitem getBookitemid() {
         return bookitemid;
@@ -179,4 +191,34 @@ public class Familytransaction {
 	public void setUpdatedtime(Calendar updatedtime) {
         this.updatedtime = updatedtime;
     }
+
+	public boolean isSelectedbook() {
+		return selectedbook;
+	}
+
+	public void setSelectedbook(boolean selectedbook) {
+		this.selectedbook = selectedbook;
+	}
+
+	public BigDecimal getFee() {
+		if(this.getTransactiontype().equalsIgnoreCase(Utils.FAMILY_TRANSACTION_BUYBOOK)){
+			return this.getBookitemid().getBookprice();
+		}
+		
+		if(this.getTransactiontype().equalsIgnoreCase(Utils.FAMILY_TRANSACTION_REGISTER)){
+			if(this.getBookitemid() != null)
+				return this.getSemestercourseid().getPrice().add(this.getBookitemid().getBookprice());
+			else {
+				return this.getSemestercourseid().getPrice();
+			}
+		}
+		
+		return new BigDecimal(0);
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
+	}
+	
+	
 }

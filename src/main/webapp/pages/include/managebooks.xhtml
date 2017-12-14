@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	
+		  <p:dataTable value="#{familyBean.buybookFamilytransactions}" rowKey="#{familytransaction.id}"
+            selection="#{familyBean.familytransaction}" selectionMode="single" 
+        	var="familytransaction" emptyMessage="Your have no books ordered."
+        	resizableColumns="true" widgetVar="familytransactionsTable" >
+			<p:column headerText="Book Code">
+            	<h:outputText value="#{familytransaction.bookitemid.bookcode}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Name" >
+            	<h:outputText value="#{familytransaction.bookitemid.bookname}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Description" >
+            	<h:outputText value="#{familytransaction.bookitemid.bookdescription}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Chinese Name" >
+            	<h:outputText value="#{familytransaction.bookitemid.bookchinesename}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Price" >
+            	<h:outputText value="$#{familytransaction.bookitemid.bookprice}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Sold-Stock" >
+            	<h:outputText value="#{familytransaction.bookitemid.amountsold} sold-#{familytransaction.bookitemid.amountinstock} in stock" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Student - Class" >
+            	<h:outputText value="#{familytransaction.studentid.firstname} - #{familytransaction.semestercourseid.semestercoursecode}"
+            		rendered="#{familytransaction.transactiontype eq 'RG'}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Status" >
+            	<h:outputText value="#{familytransaction.status}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column styleClass="action-column">
+            <f:facet name="header">
+              <h:outputText value="Actions" />
+            </f:facet>
+            <p:commandButton id="deleteOrderedbookButton" icon="fa fa-trash-o" 
+              rendered="#{familytransaction.status eq 'ORDERED'}"
+              oncomplete="PF('deleteOrderedbookDialogWidget').show()" 
+              title="#{messages.label_delete}">
+              <f:setPropertyActionListener value="#{familytransaction}" target="#{familyBean.familytransaction}" />
+            </p:commandButton>
+            <p:tooltip for="deleteOrderedbookButton" position="top" value="#{messages.label_delete}" showEffect="fade" hideEffect="fade" />
+            
+            <p:commandButton id="processOrderedbookButton" icon="fa fa-pencil-square-o" 
+              rendered="#{familytransaction.status eq 'ORDERED' and request.isUserInRole('ROLE_XILINADMIN')}"
+              oncomplete="PF('processOrderedbookDialogWidget').show()" title="#{messages.label_process}">
+              <f:setPropertyActionListener value="#{familytransaction}" target="#{familyBean.familytransaction}" />
+            </p:commandButton>
+            <p:tooltip for="processOrderedbookButton" position="top" value="#{messages.label_process}" showEffect="fade" hideEffect="fade" />
+            
+            <p:commandButton id="returnOrderedbookButton" icon=" fa fa-undo" 
+              rendered="#{familytransaction.status eq 'PROCESSED' and request.isUserInRole('ROLE_XILINADMIN')}"
+              oncomplete="PF('returnOrderedbookDialogWidget').show()" title="#{messages.label_return}">
+              <f:setPropertyActionListener value="#{familytransaction}" target="#{familyBean.familytransaction}" />
+            </p:commandButton>
+            <p:tooltip for="returnOrderedbookButton" position="top" value="#{messages.label_return}" showEffect="fade" hideEffect="fade" />
+            
+          </p:column>
+          </p:dataTable>
+          
+          <br/>
+          
+		  <p:dataTable value="#{familyBean.allBookitems}" rowKey="#{bookitem.id}"
+                 selection="#{familyBean.bookitem}" selectionMode="single" 
+        		var="bookitem" resizableColumns="true" 
+        		emptyMessage="No book available for order"
+        		filteredValue="#{familyBean.filteredBookitems}" widgetVar="bookitemsTable"
+        		paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
+
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search Available Books for order" />
+					<h:inputText id="globalFilter"
+						onkeyup="PF('bookitemsTable').filter()" />
+				</p:outputPanel>		
+			</f:facet>
+
+			<p:column headerText="Select Book" styleClass="action-column">
+            	<p:selectBooleanCheckbox value="#{bookitem.selected}" />
+        	</p:column>
+        	<p:column headerText="Book Code" sortBy="#{bookitem.bookcode}" 
+       			filterMatchMode="contains" filterBy="#{bookitem.bookcode}">
+            	<h:outputText value="#{bookitem.bookcode}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Name" sortBy="#{bookitem.bookname}" 
+       			filterMatchMode="contains" filterBy="#{bookitem.bookname}">
+            	<h:outputText value="#{bookitem.bookname}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Description" sortBy="#{bookitem.bookdescription}" 
+       			filterMatchMode="contains" filterBy="#{bookitem.bookdescription}">
+            	<h:outputText value="#{bookitem.bookdescription}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Chinese Name" sortBy="#{bookitem.bookchinesename}" 
+       			filterMatchMode="contains" filterBy="#{bookitem.bookchinesename}">
+            	<h:outputText value="#{bookitem.bookchinesename}" >
+            	</h:outputText>
+        	</p:column>
+       		<p:column headerText="Price" sortBy="#{bookitem.bookprice}" >
+            	<h:outputText value="$#{bookitem.bookprice}" >
+            	</h:outputText>
+        	</p:column>
+          </p:dataTable>
+	
+		
+</ui:composition>

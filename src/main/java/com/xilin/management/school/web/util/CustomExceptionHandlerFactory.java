@@ -3,15 +3,15 @@ package com.xilin.management.school.web.util;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerFactory;
 
-public class ViewExpiredExceptionExceptionHandlerFactory extends ExceptionHandlerFactory {
+public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
     private ExceptionHandlerFactory parent;
 
-    public ViewExpiredExceptionExceptionHandlerFactory(ExceptionHandlerFactory parent) {
+    public CustomExceptionHandlerFactory(ExceptionHandlerFactory parent) {
         this.parent = parent;
     }
 
     @Override
     public ExceptionHandler getExceptionHandler() {
-        return new ViewExpiredExceptionExceptionHandler(parent.getExceptionHandler());
+        return new CustomExceptionHandler(parent.getExceptionHandler());
     }
 }

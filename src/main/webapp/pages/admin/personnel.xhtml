@@ -64,26 +64,29 @@
             <f:facet name="header">
               <h:outputText value="Actions" />
             </f:facet>
-            <p:commandButton id="viewButton" icon="fa fa-fw fa-eye" update=":viewForm:viewPanelGrid" oncomplete="PF('viewDialogWidget').show()" title="#{messages.label_view}">
-              <f:setPropertyActionListener value="#{personnel}" target="#{personnelBean.personnel}" />
-            </p:commandButton>
-            <p:tooltip for="viewButton" position="top" value="#{messages.label_view}" showEffect="fade" hideEffect="fade" />
-            
             <p:commandButton id="editButton" icon="fa fa-fw fa-edit" update=":editForm:editPanelGrid" oncomplete="PF('editDialogWidget').show()" title="#{messages.label_edit}">
               <f:setPropertyActionListener value="#{personnel}" target="#{personnelBean.personnel}" />
             </p:commandButton>
             <p:tooltip for="editButton" position="top" value="#{messages.label_edit} personnel" showEffect="fade" hideEffect="fade" />
             
-            <p:commandButton id= "changePwdButton" icon="fa fa-fw fa-key" update=":changePasswordForm:changePasswordPanelGrid" oncomplete="PF('changePasswordDialogWidget').show()" title="Change Password">
-              <f:setPropertyActionListener value="#{personnel}" target="#{personnelBean.personnel}" />
-            </p:commandButton>
-            <p:tooltip for="changePwdButton" position="top" value="Change Password" showEffect="fade" hideEffect="fade" />
-         
-            <p:commandButton id="deactivateButton" icon="fa fa-fw fa-close" rendered="#{personnel.active}"
-            	oncomplete="PF('deactivateDialogWidget').show()" title="#{messages.label_deactivate}">
-              <f:setPropertyActionListener value="#{personnel}" target="#{personnelBean.personnel}" />
-            </p:commandButton>
-            <p:tooltip for="deactivateButton" position="top" value="Deactivate" showEffect="fade" hideEffect="fade" />
+            <p:menuButton value="More">
+              <p:menuitem value="View" oncomplete="PF('viewDialogWidget').show()"
+                update=":viewForm:viewPanelGrid"
+                actionListener="#{personnelBean.onChangePersonnelAction}" icon="fa fa-fw fa-eye">
+                <f:param name="personnelrowid" value="#{personnel.id}"/>
+              </p:menuitem>
+              <p:menuitem value="Change Password" oncomplete="PF('changePasswordDialogWidget').show()"
+                update=":changePasswordForm:changePasswordPanelGrid"
+                actionListener="#{personnelBean.onChangePersonnelAction}" icon="fa fa-fw fa-key">
+                <f:param name="personnelrowid" value="#{personnel.id}"/>
+              </p:menuitem>
+              <p:menuitem value="Deactivate" oncomplete="PF('deactivateDialogWidget').show()"
+                rendered="#{personnel.active}"
+                actionListener="#{personnelBean.onChangePersonnelAction}" icon="fa fa-fw fa-close">
+                <f:param name="personnelrowid" value="#{personnel.id}"/>
+              </p:menuitem>
+            </p:menuButton>
+            
           </p:column>
         </p:dataTable>
       </p:panel>

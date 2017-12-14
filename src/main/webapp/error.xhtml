@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<f:view locale="#{localeBean.locale}" contentType="text/html">
+  <h:head>
+    <title>#{applicationBean.appName}</title>
+    <h:outputStylesheet library="css" name="standard.css" />
+  </h:head>
+  <h:body>
+    <h:panelGrid columns="1" columnClasses="content">
+        <p:panel cellspacing="0" cellpadding="0" styleClass="content">
+          <f:facet name="header">
+            <h:outputFormat value="#{messages.label_welcome_titlepane}">
+              <f:param value="#{applicationBean.appName}" />
+            </h:outputFormat>
+          </f:facet>
+          <h:form>
+            <h3>
+			  <h:outputText value="Error Occured! " escape="false" />
+			  <br/>
+			</h3>
+			<h5>
+				If the issue persists, contact your support personnel
+				<br/><br/>
+				Click the image below to return to home page.
+				<br/><br/>
+				<h:outputLink value="#{request.contextPath}/index.html">
+              		<h:graphicImage library="images" name="roo_logo.png" style="width: 128px; height: 71px;" styleClass="banner" />
+            	</h:outputLink>
+			</h5>
+			
+			<h3>
+			  <br/>
+			  <h:outputText value="Error Details:" escape="false" />
+			  <br/>
+			</h3>
+            <h:outputText value="#{flash.keep.errorDetails}" />
+	            
+          </h:form>
+        </p:panel>
+    </h:panelGrid>
+  </h:body>
+</f:view>
+</html>

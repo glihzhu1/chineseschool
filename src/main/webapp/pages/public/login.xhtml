@@ -6,12 +6,19 @@
 		xmlns:p="http://primefaces.org/ui" >
 		.
   <ui:define name="content">
+    <h:form prependId="false" id="growlForm">
+      <p:growl id="growl" showDetail="false" />
+      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </h:form>
+    
       <div align="center">
-    	<h4>Please login here:</h4>
         <h:form id="loginForm">
-        <h:panelGrid id="loginPanelGrid" columns="1" 
+          <h:panelGrid id="loginPanelGrid" columns="1" 
+        	rendered="#{applicationBean.userDetails == null}"
         	style="margin: 0 auto;" styleClass="dialog" columnClasses="col1,col1" >
-          	
+          	<br/>
+          	<h:outputText value="Please login here: "/>
+          
           	<h:inputText id="username" requiredMessage="Username is required"
             	value="#{applicationBean.username}" required="true"/>
             <p:watermark for="username" value="Username" id="watermarkUsername" />
@@ -30,7 +37,7 @@
             <h:panelGroup>
             <h:panelGrid columns="1">
             	<p:commandButton id="loginButton" value="Login" action="#{applicationBean.login}" 
-            		update="loginPanelGrid" />
+            		update="loginPanelGrid :growlForm:growl" />
             </h:panelGrid>
             </h:panelGroup>
           </h:panelGrid>

@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.el.ELContext;
@@ -275,6 +276,15 @@ public class PersonnelBean implements Serializable {
         return findAllPersonnels();
     }
 
+	public void onChangePersonnelAction() {
+		Map<String,String> params =
+			FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+
+		String personnelrowid = params.get("personnelrowid");
+		
+		personnel = personnelRepository.findOne(Integer.valueOf(personnelrowid));
+	}
+	
 	public void reset() {
         personnel = null;
         selectedSemestercourse = null;

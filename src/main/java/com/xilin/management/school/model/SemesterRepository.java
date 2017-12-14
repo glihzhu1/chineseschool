@@ -8,7 +8,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SemesterRepository extends JpaRepository<Semester, Integer>, JpaSpecificationExecutor<Semester> {
 	
-	public List<Semester> findTop2ByOrderByUpdatedtimeDesc();
+	//public List<Semester> findTop2ByOrderByUpdatedtimeDesc();
+	public List<Semester> findByDescriptionIgnoreCase(String description);
+	
+	public List<Semester> findTop2ByOrderByStartdateDesc();
 
-	public List<Semester> findTop1ByOrderByUpdatedtimeDesc();
+	public Semester findFirstByOrderByUpdatedtimeDesc();
+	
+	public Semester findFirstByOrderByRegisterstartdateDesc();
 }

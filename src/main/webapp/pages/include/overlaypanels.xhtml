@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	
+		  
+    	
+    	<p:overlayPanel widgetVar="teacherOProw" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+	    <p:outputPanel id="teacherDetailrow" style="text-align:center;">
+	      <p:panelGrid  columns="2">
+	        <f:facet name="header">
+	          <h:outputText value="Detail" />
+	        </f:facet>
+	 		<h:outputText value="Name:" />
+	        <h:outputText value="#{familyBean.semestercourse.teacherid.lastname}, #{familyBean.semestercourse.teacherid.firstname}" />
+	 		<h:outputText value="Email:" />
+	        <h:outputText value="#{familyBean.semestercourse.teacherid.email}" />
+	        <h:outputText value="Home Phone: " />
+	        <h:outputText value="#{familyBean.semestercourse.teacherid.homephone}" />
+	        <h:outputText value="Cell Phone: " />
+	        <h:outputText value="#{familyBean.semestercourse.teacherid.cellphone}" />
+	 	  </p:panelGrid>
+	    </p:outputPanel>
+	  </p:overlayPanel>
+	  <p:overlayPanel widgetVar="bookitemOProw" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+	    <p:outputPanel id="bookitemDetailrow" style="text-align:center;">
+	      <p:panelGrid  columns="2">
+	        <f:facet name="header">
+	          <h:outputText value="Detail" />
+	        </f:facet>
+	        <h:outputText value="Book Code: " />
+	        <h:outputText value="#{familyBean.bookitem.bookcode}" />
+	 		<h:outputText value="Name:" />
+	        <h:outputText value="#{familyBean.bookitem.bookname}" />
+	 		<h:outputText value="Descriptionl:" />
+	        <h:outputText value="#{familyBean.bookitem.bookdescription}" />
+	        <h:outputText value="Price/Discount " />
+	        <h:outputText value="#{familyBean.bookitem.bookprice}/#{familyBean.bookitem.bookdiscountprice}" />
+	        <h:outputText value="Stock/Sold:" />
+	        <h:outputText value="#{familyBean.bookitem.amountinstock}/#{familyBean.bookitem.amountsold}" />
+	      </p:panelGrid>
+	    </p:outputPanel>
+	  </p:overlayPanel>
+	
+	
+		
+</ui:composition>

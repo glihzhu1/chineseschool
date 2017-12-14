@@ -1,8 +1,11 @@
 package com.xilin.management.school.model;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +55,16 @@ public class SemesterweekIntegrationTest {
         long count = semesterweekRepository.count();
         Assert.assertTrue("Too expensive to perform a find all test for 'Semesterweek', as there are " + count + " entries; set the findAllMaximum to exceed this value or set findAll=false on the integration test annotation to disable the test", count < 250);
         List<Semesterweek> result = semesterweekRepository.findAll();
+        Assert.assertNotNull("Find all method for 'Semesterweek' illegally returned null", result);
+        Assert.assertTrue("Find all method for 'Semesterweek' failed to return any data", result.size() > 0);
+    }
+
+	@Test
+    public void testQueryAllSemesterweeks() {
+        Assert.assertNotNull("Data on demand for 'Semesterweek' failed to initialize correctly", dod.getRandomSemesterweek());
+        long count = semesterweekRepository.count();
+        Assert.assertTrue("Too expensive to perform a find all test for 'Semesterweek', as there are " + count + " entries; set the findAllMaximum to exceed this value or set findAll=false on the integration test annotation to disable the test", count < 250);
+        Set<Semesterweek> result = semesterweekRepository.queryAllSemesterweeks();
         Assert.assertNotNull("Find all method for 'Semesterweek' illegally returned null", result);
         Assert.assertTrue("Find all method for 'Semesterweek' failed to return any data", result.size() > 0);
     }

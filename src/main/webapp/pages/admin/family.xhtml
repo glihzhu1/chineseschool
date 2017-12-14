@@ -9,190 +9,8 @@
       xmlns:pe="http://primefaces.org/ui/extensions">
 <ui:composition template="/templates/layout.xhtml">
   <ui:define name="content">
-    <h:form prependId="false" id="growlForm">
-      <p:growl id="growl" showDetail="false" />
-      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-    </h:form>
-    <h:form prependId="false" id="dataForm">
-    <ui:include src="../ajaxStatus.xhtml"/>
-      <p:panel id="data" toggleable="true" toggleSpeed="250">
-        <h:panelGrid columns="2" styleClass="center-block">
-		  <h:panelGroup layout="block">
-			<h:panelGrid columns="1">
-			  <p:inputText id="searchTerm" size="12"
-					placeholder="search family" value="#{familyBean.strSearchTerm}" />
-			</h:panelGrid>
-		  </h:panelGroup>
-		  <h:panelGroup layout="block">
-			<h:panelGrid columns="1">
-			  <h:commandButton  action="#{familyBean.searchFamilies}"
-				update=":dataForm:data :growlForm:growl" 
-    			value="search" >
-    		  </h:commandButton>
-    		</h:panelGrid>
-		  </h:panelGroup>
-		</h:panelGrid>
-		
-        <p:dataTable id="list" value="#{familyBean.familyLazyModel}" var="family" 
-        	emptyMessage="no items found" rowKey="#{family.id}" 
-            selection="#{familyBean.family}" selectionMode="single"
-            filteredValue="#{familyBean.filteredFamily}" rowExpandMode="single"
-        	paginator="true" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-        	rowsPerPageTemplate="5,10,50" rows="5" lazy="true">
-        <p:ajax event="page" update=":@this :dataForm:ajaxStatus"/>
-        <p:ajax event="rowToggle" listener="#{familyBean.onRowToggle}" />
-        <p:column exportable="false" width="3%">
-			<p:rowToggler />
-		</p:column>
-         <p:column headerText="Dad LName (Fid) - Status" sortBy="#{family.fatherlastname}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.fatherlastname}">
-          <h:outputText value="#{family.fatherlastname} (#{family.id})"/>
-          <h:outputText value="#{family.active? '-A' : '-I'}" style="font-weight: bold; color: red;"/>
-        </p:column>
-        <p:column headerText="FName" sortBy="#{family.fatherfirstname}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.fatherfirstname}">
-          <h:outputText value="#{family.fatherfirstname}"/>
-        </p:column>
-        <p:column headerText="Mom LName" sortBy="#{family.motherlastname}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.motherlastname}">
-          <h:outputText value="#{family.motherlastname}"/>
-        </p:column>
-        <p:column headerText="FName" sortBy="#{family.motherfirstname}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.motherfirstname}">
-          <h:outputText value="#{family.motherfirstname}"/>
-        </p:column>
-        <p:column headerText="Home" sortBy="#{family.homephone}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.homephone}">
-          <h:outputText value="#{family.homephone}"/>
-        </p:column>
-        <p:column headerText="Cell" sortBy="#{family.cellphone}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.cellphone}">
-          <h:outputText value="#{family.cellphone}"/>
-        </p:column>
-        <p:column headerText="Login" sortBy="#{family.loginId}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.loginId}">
-          <h:outputText value="#{family.loginId}"/>
-        </p:column>
-        <p:column headerText="Email" sortBy="#{family.email}" style="text-align:center"
-        	filterMatchMode="contains" filterBy="#{family.email}">
-          <h:outputText value="#{family.email}"/>
-        </p:column>
-          <p:column styleClass="action-column">
-            <f:facet name="header">
-              <h:outputText value="Actions" />
-            </f:facet>
-            
-            <p:commandButton id="addStudentButton" icon="fa fa-fw fa-plus" update=":addStudentForm:addStudentPanelGrid" oncomplete="PF('addStudentWidget').show()" title="#{messages.label_create}">
-              <f:setPropertyActionListener value="#{family}" target="#{familyBean.family}" />
-            </p:commandButton>
-            <p:tooltip for="addStudentButton" position="top" value="Add Student" showEffect="fade" hideEffect="fade" />
-            
-            <p:commandButton id="viewButton" icon="fa fa-fw fa-eye" update=":viewForm:viewPanelGrid" oncomplete="PF('viewDialogWidget').show()" title="#{messages.label_view}">
-                  <f:setPropertyActionListener value="#{family}" target="#{familyBean.family}" />
-                </p:commandButton>
-            <p:tooltip for="viewButton" position="top" value="#{messages.label_view}" showEffect="fade" hideEffect="fade" />
-            
-            <p:commandButton id="editButton" icon="fa fa-fw fa-edit" update=":editForm:editPanelGrid" oncomplete="PF('editDialogWidget').show()" title="#{messages.label_edit}">
-              <f:setPropertyActionListener value="#{family}" target="#{familyBean.family}" />
-            </p:commandButton>
-            <p:tooltip for="editButton" position="top" value="#{messages.label_edit} Family" showEffect="fade" hideEffect="fade" />
-            
-            <p:commandButton id= "changePwdButton" icon="fa fa-fw fa-key" update=":changePasswordForm:changePasswordPanelGrid" oncomplete="PF('changePasswordDialogWidget').show()" title="Change Password">
-              <f:setPropertyActionListener value="#{family}" target="#{familyBean.family}" />
-            </p:commandButton>
-            <p:tooltip for="changePwdButton" position="top" value="Change Password" showEffect="fade" hideEffect="fade" />
-         
-            <p:commandButton id="deactivateButton" icon="fa fa-fw fa-close" rendered="#{family.active}"
-            	oncomplete="PF('deactivateDialogWidget').show()" title="#{messages.label_deactivate}">
-              <f:setPropertyActionListener value="#{family}" target="#{familyBean.family}" />
-            </p:commandButton>
-            <p:tooltip for="deactivateButton" position="top" value="Deactivate" showEffect="fade" hideEffect="fade" />
-          </p:column>
-          
-          <p:rowExpansion>
-			<p:dataTable id="display" var="student" value="#{familyBean.selectedStudents}" 
-				emptyMessage="no students found for the family" rowKey="#{student.id}" 
-                 selection="#{familyBean.student}" selectionMode="single"
-                 style="width:800px;">
-				<p:column>
-					<f:facet name="header">
-						<h:outputText value="Student ID -Status" style="color: blue"></h:outputText>
-					</f:facet>
-					<h:outputText value="#{student.id}" />
-					<h:outputText value="#{student.active? ' -A' : ' -I'}" style="font-weight: bold; color: red;"/>
-				</p:column>
-				<p:column>
-					<f:facet name="header">
-						<h:outputText value="Name" style="color: blue"></h:outputText>
-					</f:facet>
-					<h:outputText value="#{student.firstname} #{student.lastname}" />
-				</p:column>
-				<p:column>
-					<f:facet name="header">
-						<h:outputText value="Chinese Name" style="color: blue"></h:outputText>
-					</f:facet>
-					<h:outputText value="#{student.chinesename}" />
-				</p:column>
-				<p:column>
-					<f:facet name="header">
-						<h:outputText value="Birth Date" style="color: blue"></h:outputText>
-					</f:facet>
-					<h:outputText value="#{student.dob.time}" >
-						<f:convertDateTime pattern="MM/dd/yyyy" type="date"/>
-					</h:outputText>
-				</p:column>
-				<p:column>
-					<f:facet name="header">
-						<h:outputText value="Gender" style="color: blue"></h:outputText>
-					</f:facet>
-					<h:outputText value="#{student.gender}" />
-				</p:column>
-				<p:column styleClass="action-column">
-	            <f:facet name="header">
-	              <h:outputText value="Actions" />
-	            </f:facet>
-	            
-	            <p:commandButton id="registerButton" icon="fa fa-fw fa-shopping-cart" title="Register Class" rendered="#{student.active}">
-	              <f:setPropertyActionListener value="#{student}" target="#{familyBean.student}" />
-	            </p:commandButton>
-	            <p:tooltip for="registerButton" position="top" value="Register Class" showEffect="fade" hideEffect="fade" />
-	          
-            	<p:commandButton id="editStudentButton" icon="fa fa-fw fa-edit" action="#{familyBean.onEditStudent}"
-            		update=":editStudentForm:editStudentPanelGrid" oncomplete="PF('editStudentDialogWidget').show()" title="#{messages.label_edit}">
-              	  <f:setPropertyActionListener value="#{student}" target="#{familyBean.student}" />
-            	</p:commandButton>
-            	<p:tooltip for="editStudentButton" position="top" value="#{messages.label_edit} Student" showEffect="fade" hideEffect="fade" />
-            
-            	<p:commandButton id="deactivateStudentButton" icon="fa fa-fw fa-close" rendered="#{student.active}"
-            		oncomplete="PF('deactivateStudentDialogWidget').show()" title="#{messages.label_deactivate}">
-                  <f:setPropertyActionListener value="#{student}" target="#{familyBean.student}" />
-            	</p:commandButton>
-            	<p:tooltip for="deactivateStudentButton" position="top" value="Deactivate" showEffect="fade" hideEffect="fade" />
-            
-	          </p:column>
-			</p:dataTable>
-
-		</p:rowExpansion>
-		
-		
-        </p:dataTable>
-        
-        
-        
-     <p:panel header="Export PDF">  
-       <p:commandLink id="pdf" ajax="false">  
-         <p:graphicImage value="/resources/images/pdf.png"/>  
-           <f:setPropertyActionListener value="true" target="#{exporterController.customExporter}" />  
-         <pe:exporter type="pdf" target="list" fileName="listDetails" datasetPadding="4"/>  
-  
-        </p:commandLink>    
-  
-	  </p:panel>  
-
-
-      </p:panel>
-      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-    </h:form>
+    <ui:include src="../include/familystudents.xhtml" />
+    
     <p:dialog id="createDialog" header="#{messages.label_create} Family" modal="true" widgetVar="createDialogWidget" dynamic="true" visible="#{familyBean.createDialogVisible}" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
       <p:ajax event="close" update=":dataForm:data" listener="#{familyBean.handleDialogClose}" />
       <p:outputPanel id="createPanel">
@@ -353,361 +171,15 @@
       		
       	  </h:panelGrid>
           
-          <p:commandButton id="createSaveButton" value="#{messages.label_save}" action="#{familyBean.persist}" update="createPanelGrid :growlForm:growl" />
+          <p:commandButton id="createSaveButton" value="#{messages.label_save}" 
+            oncomplete="PF('createDialogWidget').hide()"
+            action="#{familyBean.persist}" update="createPanelGrid :growlForm:growl" />
           <p:commandButton id="createCloseButton" value="#{messages.label_close}" onclick="PF('createDialogWidget').hide()" type="button" />
-        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
-      </p:outputPanel>
-    </p:dialog>
-    <p:dialog id="viewDialog" header="#{messages.label_view} Family" modal="true" widgetVar="viewDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
-      <p:outputPanel id="viewPanel">
-        <h:form id="viewForm" enctype="multipart/form-data">
-          <h:panelGrid id="viewPanelGrid" columns="1" styleClass="dialog" >
-       		<h:panelGrid columns="3" columnClasses="col1,col2,col3">
-       			<h:outputLabel value="Username: "/>
-       			<p:spacer width="10" height="10"></p:spacer>
-	   			<h:outputText value="#{familyBean.family.loginId}"/>
-	   			
-	   			<h:outputLabel value="Email: " />
-	   			<p:spacer width="10" height="10"></p:spacer>
-	   			<h:outputText value="#{familyBean.family.email}"/>
-	   		</h:panelGrid>
-	   		
-	   		<p:separator ></p:separator>
-	   		<h:panelGrid columns="2" columnClasses="col1,col2">
-	      		<h:outputText value="Father: "/>
-	   			<h:outputText value="#{familyBean.family.fatherfirstname} #{familyBean.family.fatherlastname}"/>
-	   			
-	   		</h:panelGrid>
-	   		<h:panelGrid columns="2" columnClasses="col1,col2">
-	      		<h:outputText value="Mother:  "/>
-	   			<h:outputText value="#{familyBean.family.motherfirstname} #{familyBean.family.motherlastname}"/>
-	   			
-	   		</h:panelGrid>
-	   		<br/>
-      		<h:outputLabel value="Contact Information"/>
-	      	<h:panelGrid columns="2" columnClasses="col2,col2">
-	      		<h:outputText value="#{familyBean.family.address1}"/>
-	   			<h:outputText value="#{familyBean.family.address2}"/>
-	   			<h:outputText value="#{familyBean.family.city}, "/>
-	   			<h:outputText value="#{familyBean.family.state} #{familyBean.family.zip}"/>
-	   			
-	   		</h:panelGrid>
-   			<br/>
-   			<h:panelGrid columns="5" >
-	      		<h:outputText value="Home phone: " style="font-weight: bold;" />
-	      		<h:outputText value="#{familyBean.family.homephone}"/>
-	      		<p:spacer width="10" height="10"></p:spacer>
-	      		<h:outputText value="Cell phone: " style="font-weight: bold;" />
-	   			<h:outputText value="#{familyBean.family.cellphone}"/>
-	   		</h:panelGrid>
-      			
-    	  </h:panelGrid>
-    	  <br/>
-          <p:commandButton id="viewCloseButton" value="#{messages.label_close}" onclick="PF('viewDialogWidget').hide()" type="button" />
-        </h:form>
-      </p:outputPanel>
-    </p:dialog>
-    
-    
-    
-    
-    <p:dialog id="editDialog" header="#{messages.label_edit} Family" modal="true" widgetVar="editDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
-      <p:ajax event="close" update=":dataForm:data" listener="#{familyBean.handleDialogClose}" />
-      <p:outputPanel id="editPanel">
-        <h:form id="editForm" enctype="multipart/form-data">
-          <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-          	<h:panelGrid columns="1" styleClass="dialog">
-	          	<h:outputLabel value="User Login Information" style="color:red"/>
-            </h:panelGrid>
-            <h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="4" styleClass="dialog" columnClasses="col1,col1,col1,col1" >
-	          		<h:outputText  value="username: " />
-		          	<h:inputText id="usernameedit" value="#{familyBean.family.loginId}"  
-		          		requiredMessage="Username is required" required="true"/>
-		      		<p:watermark for="usernameedit" value="Username (required)" 
-		      			id="watermarkUsername" />
-		            <p:message for="usernameedit"></p:message>
-	            </h:panelGrid>
-	            
-	            <p:spacer width="10" height="10"></p:spacer>
-	            
-	          	<h:panelGrid columns="1" styleClass="dialog" columnClasses="col1" >
-		          	<h:outputText  value="Email: " />
-	            </h:panelGrid>
-	        	
-	        	<p:spacer width="10" height="10"></p:spacer>
-	            
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		            <h:inputText requiredMessage="Email is required" id="familyemailedit"
-		            	value="#{familyBean.family.email}" 
-		            	validatorMessage="email format is invalid" required="true">
-                		<f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-		        	</h:inputText>
-		        	<p:watermark for="familyemailedit" value="Login Email (required)" id="watermarkEmailEdit" />
-		        	<p:message for="familyemailedit"></p:message>
-	      		</h:panelGrid>
-      		</h:panelGrid>
-      		
-      		<br/>
-      		<h:panelGrid columns="3" styleClass="dialog">
-      			<h:outputText value="Active? " />
-      			<p:spacer width="10" height="10"></p:spacer>
-        		<p:selectBooleanCheckbox value="#{familyBean.family.active}" />
-        	</h:panelGrid>
-      		<br/>
-      		<h:panelGrid columns="1" styleClass="dialog">
-	          	<h:outputLabel value="Father Information (at least one parent information is needed)" style="color:red"/>
-            </h:panelGrid>
-            <h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="fatherfirstnameedit" value="#{familyBean.family.fatherfirstname}"/>
-		      		<p:watermark for="fatherfirstnameedit" value="First Name"/>
-		            <p:message for="fatherfirstnameedit"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="fatherlastnameedit" value="#{familyBean.family.fatherlastname}"/>
-		      		<p:watermark for="fatherlastnameedit" value="Last Name"/>
-		            <p:message for="fatherlastnameedit"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="fatherchinesenameedit" value="#{familyBean.family.fatherchinesename}"/>
-		      		<p:watermark for="fatherchinesenameedit" value="Chinese Name"/>
-		            <p:message for="fatherchinesenameedit"></p:message>
-	            </h:panelGrid>
-      		</h:panelGrid>
-      		
-      		<h:panelGrid columns="1" styleClass="dialog">
-	          	<h:outputLabel value="Mother Information" style="color:red"/>
-            </h:panelGrid>
-            <h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="motherfirstnameedit" value="#{familyBean.family.motherfirstname}"/>
-		      		<p:watermark for="motherfirstnameedit" value="First Name"/>
-		            <p:message for="motherfirstnameedit"></p:message>
-	            </h:panelGrid>
-	        	<p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="motherlastnameedit" value="#{familyBean.family.motherlastname}"/>
-		      		<p:watermark for="motherlastnameedit" value="Last Name"/>
-		            <p:message for="motherlastnameedit"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="motherchinesenameedit" value="#{familyBean.family.motherchinesename}"/>
-		      		<p:watermark for="motherchinesenameedit" value="Chinese Name"/>
-		            <p:message for="motherchinesenameedit"></p:message>
-	            </h:panelGrid>
-      		</h:panelGrid>
-      		
-      		<br/>
-      		<h:panelGrid columns="1" styleClass="dialog">
-	          	<h:outputLabel value="Address Information" style="color:red"/>
-            </h:panelGrid>
-            <h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="address1edit" value="#{familyBean.family.address1}"
-		          		requiredMessage="Address is required" required="true"/>
-		      		<p:watermark for="address1edit" value="Address (required)"/>
-		            <p:message for="address1edit"></p:message>
-	            </h:panelGrid>
-	            
-	            <p:spacer width="10" height="10"></p:spacer>
-	            
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="addresscityedit" value="#{familyBean.family.city}"
-		          		requiredMessage="City is required" required="true"/>
-		      		<p:watermark for="addresscityedit" value="City (required)"/>
-		            <p:message for="addresscityedit" style="color:red"></p:message>
-	            </h:panelGrid>
-	        	
-	        	<h:outputText value="  IL  " />
-	            
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="addresszipedit" value="#{familyBean.family.zip}"
-		          	  maxlength="5" requiredMessage="Zip code is required" required="true"/>
-		      		<p:watermark for="addresszipedit" value="Zip Code(required - 5 digits)"/>
-		            <p:message for="addresszipedit" style="color:red"></p:message>
-	            </h:panelGrid>
-      		</h:panelGrid>
-      		
-      		<br/>
-      		
-      		<h:panelGrid columns="1" styleClass="dialog">
-	          	<h:outputLabel value="Contact Information (At least one phone information is needed)" style="color:red"/>
-            </h:panelGrid>
-            <h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="homephoneedit" validatorMessage="invalid Home Phone format"
-		          		maxlength="10" value="#{familyBean.family.homephone}">
-		          		<f:validateRegex pattern="^([+]?[\d]+)?$" />
-		          	</h:inputText>
-		      		<p:watermark for="homephoneedit" value="Home Phone"/>
-		            <p:message for="homephoneedit"></p:message>
-	            </h:panelGrid>
-	            
-	            <p:spacer width="10" height="10"></p:spacer>
-	            
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="cellphoneedit" validatorMessage="invalid Cell Phone format" 
-		          		maxlength="10" value="#{familyBean.family.cellphone}">
-		          		<f:validateRegex pattern="^([+]?[\d]+)?$" />
-		          	</h:inputText>
-		      		<p:watermark for="cellphoneedit" value="Cell Phone"/>
-		      		<p:message for="cellphoneedit"></p:message>
-	            </h:panelGrid>
-	        	
-	        	<p:spacer width="10" height="10"></p:spacer>
-	            
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="secondaryemailedit" value="#{familyBean.family.xilinemail}"
-		          		validatorMessage="secondary email format is invalid">
-                		<f:validateRegex pattern="^([_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,}))?$" />
-                	</h:inputText>
-		      		<p:watermark for="secondaryemailedit" value="Secondary Email"/>
-		      		<p:message for="secondaryemailedit"></p:message>
-	            </h:panelGrid>
-      		</h:panelGrid>
-      	  </h:panelGrid>
-          <br/>
-          <p:commandButton id="editSaveButton" value="#{messages.label_save}" action="#{familyBean.persist}" update=":dataForm:data editPanelGrid :growlForm:growl" />
-          <p:commandButton id="editCloseButton" value="#{messages.label_close}" onclick="PF('editDialogWidget').hide()" type="button" />
           <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
       </p:outputPanel>
     </p:dialog>
-    <p:dialog id="addStudentDialog" header="#{messages.label_create} Student" modal="true" widgetVar="addStudentWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
-      <p:outputPanel id="addStudentPanel">
-        <h:form id="addStudentForm" enctype="multipart/form-data">
-          <h:panelGrid id="addStudentPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
-          	<h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="studentfirstname" value="#{familyBean.student.firstname}"
-		          		requiredMessage="First name is required" required="true"/>
-		      		<p:watermark for="studentfirstname" value="First Name"/>
-		            <p:message for="studentfirstname"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="studentlastname" value="#{familyBean.student.lastname}"
-		          		requiredMessage="Last name is required" required="true"/>
-		      		<p:watermark for="studentlastname" value="Last Name"/>
-		            <p:message for="studentlastname"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="2" styleClass="dialog" columnClasses="col1,col2" >
-		          	<h:inputText id="studentchinesename" value="#{familyBean.student.chinesename}"/>
-		      		<p:watermark for="studentchinesename" value="Chinese Name"/>
-	            </h:panelGrid>
-      		</h:panelGrid>
-      		<br/>
-      		<h:panelGrid columns="1" styleClass="dialog" columnClasses="col1" >
-	          	<h:outputText value="Date of Birth:"/>
-	          	<p:calendar id="dob" required="true" requiredMessage="birth date is required"
-	          		value="#{familyBean.dobDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="dob"></p:message>
-      		</h:panelGrid>
-      		<br/>
-      		<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-            	<h:outputText value="Gender: "/>
-            	<p:spacer width="10" height="10"></p:spacer>
-            	<p:selectOneRadio layout="grid" columns="2" 
-            		requiredMessage="Gender is required" required="true"
-            		value="#{familyBean.student.gender}">
-       				<f:selectItem itemLabel="Male" itemValue="M" />
-       				<f:selectItem itemLabel="Female" itemValue="F"/>
-				</p:selectOneRadio>
-            </h:panelGrid>
-      	  </h:panelGrid>
-      	  <br/>
-      	  <p:commandButton value="#{messages.label_save}" action="#{familyBean.persistStudent}" update=":dataForm:data addStudentPanelGrid :growlForm:growl" />
-          <p:commandButton value="#{messages.label_close}" onclick="PF('addStudentWidget').hide()" type="button" />
-          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
-      </p:outputPanel>
-    </p:dialog>
-    <p:dialog id="editStudentDialog" header="#{messages.label_edit} Student" modal="true" widgetVar="editStudentDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
-      <p:outputPanel id="editStudentPanel">
-        <h:form id="editStudentForm" enctype="multipart/form-data">
-          <h:panelGrid id="editStudentPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
-            <h:panelGrid columns="5" styleClass="dialog" columnClasses="col1,col1,col1,col1,col1" >
-	          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="studenteditfirstname" value="#{familyBean.student.firstname}"
-		          		requiredMessage="First name is required" required="true"/>
-		      		<p:watermark for="studenteditfirstname" value="First Name"/>
-		            <p:message for="studenteditfirstname"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-		          	<h:inputText id="studenteditlastname" value="#{familyBean.student.lastname}"
-		          		requiredMessage="Last name is required" required="true"/>
-		      		<p:watermark for="studenteditlastname" value="Last Name"/>
-		            <p:message for="studenteditlastname"></p:message>
-	            </h:panelGrid>
-	            <p:spacer width="10" height="10"></p:spacer>
-	            <h:panelGrid columns="2" styleClass="dialog" columnClasses="col1,col2" >
-		          	<h:inputText id="studenteditchinesename" value="#{familyBean.student.chinesename}"/>
-		      		<p:watermark for="studenteditchinesename" value="Chinese Name"/>
-	            </h:panelGrid>
-      		</h:panelGrid>
-      		<br/>
-      		
-      		
-      		<h:panelGrid columns="3" styleClass="dialog">
-      			<h:outputText value="Active? " />
-      			<p:spacer width="10" height="10"></p:spacer>
-        		<p:selectBooleanCheckbox value="#{familyBean.student.active}" />
-        	</h:panelGrid>
-        	<br/>
-        	
-      		<h:panelGrid columns="1" styleClass="dialog" columnClasses="col1" >
-	          	<h:outputText value="Date of Birth:"/>
-	          	<p:calendar id="dobedit" required="true" requiredMessage="birth date is required"
-	          		value="#{familyBean.dobDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="dobedit"></p:message>
-      		</h:panelGrid>
-      		<br/>
-      		<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col2,col3" >
-            	<h:outputText value="Gender: "/>
-            	<p:spacer width="10" height="10"></p:spacer>
-            	<p:selectOneRadio layout="grid" columns="2" 
-            		requiredMessage="Gender is required" required="true"
-            		value="#{familyBean.student.gender}">
-       				<f:selectItem itemLabel="Male" itemValue="M" />
-       				<f:selectItem itemLabel="Female" itemValue="F"/>
-				</p:selectOneRadio>
-            </h:panelGrid>
-      	  </h:panelGrid>
-          <br/>
-          <p:commandButton id="editStuentSaveButton" value="#{messages.label_save}" action="#{familyBean.persistStudent}" update=":dataForm:data editStudentPanelGrid :growlForm:growl" />
-          <p:commandButton id="editStudentCloseButton" value="#{messages.label_close}" onclick="PF('editStudentDialogWidget').hide()" type="button" />
-          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
-      </p:outputPanel>
-    </p:dialog>
-    <p:dialog id="changePasswordDialog" header="Change Family Password" modal="true" widgetVar="changePasswordDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
-      <p:ajax event="close" update=":dataForm:data" listener="#{familyBean.handleDialogClose}" />
-      <p:outputPanel id="changePasswordPanel">
-        <h:form id="changePasswordForm" enctype="multipart/form-data">
-          <h:panelGrid id="changePasswordPanelGrid" columns="2" styleClass="dialog" columnClasses="col1,col2" >
-          		<h:outputLabel value="Username: " />
-      			<h:outputText value="#{familyBean.family.loginId}" />
-      		
-      			<h:outputLabel for="password: " value="Password " />  
-                <p:password id="password" value="#{familyBean.familyPassword}" match="confirmPass" required="true"/>  
-
-                <h:outputLabel for="confirmPass: " value="Confirm Password " />  
-                <p:password id="confirmPass" value="#{familyBean.familyConfirmPassword}" required="true" />  
-    		</h:panelGrid>
-    		<br/>
-          <p:commandButton id="changePasswordSaveButton" value="#{messages.label_save}" action="#{familyBean.persistUserChangePassword}" update="changePasswordPanelGrid :growlForm:growl" />
-          <p:commandButton id="changePasswordCloseButton" value="#{messages.label_close}" onclick="PF('changePasswordDialogWidget').hide()" type="button" />
-          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
-      </p:outputPanel>
-    </p:dialog>
+    
     <p:confirmDialog id="deactivateDialog" widgetVar="deactivateDialogWidget" message="#{messages.label_deactivate_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deactivation}" severity="alarm">
       <p:outputPanel id="deactivatePanel">
         <h:form id="deactivateForm">
@@ -717,11 +189,101 @@
         </h:form>
       </p:outputPanel>
     </p:confirmDialog>
-    <p:confirmDialog id="deactivateStudentDialog" widgetVar="deactivateStudentDialogWidget" message="#{messages.label_deactivate_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deactivation}" severity="alarm">
-      <p:outputPanel id="deactivateStudentPanel">
-        <h:form id="deactivateStudentForm">
-          <p:commandButton id="deactivateStudentYesButton" value="#{messages.label_yes}" action="#{familyBean.deactivateStudent}" update=":dataForm:data :growlForm:growl" oncomplete="PF('deactivateStudentDialogWidget').hide()" />
-          <p:commandButton id="deactivateStudentNoButton" value="#{messages.label_no}" onclick="PF('deactivateStudentDialogWidget').hide()" type="button" />
+    
+    <ui:include src="../include/familyactiondialogs.xhtml" />
+    
+    
+    
+    
+    
+    <p:confirmDialog id="processOrderedbookDialog" widgetVar="processOrderedbookDialogWidget" message="#{messages.label_process_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_process}" severity="alarm">
+      <p:outputPanel id="processOrderedbookPanel">
+        <h:form id="processOrderedbookForm">
+          <p:commandButton id="processOrderedbookYesButton" value="#{messages.label_yes}" action="#{familyBean.processBoughtBook}" 
+          	update=":orderbookForm:orderbookPanelGrid" 
+          	oncomplete="PF('processOrderedbookDialogWidget').hide()" />
+          <p:commandButton id="processOrderedbookNoButton" value="#{messages.label_no}" onclick="PF('processOrderedbookDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:confirmDialog>
+    <p:confirmDialog id="returnOrderedbookDialog" widgetVar="returnOrderedbookDialogWidget" message="#{messages.label_return_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_return}" severity="alarm">
+      <p:outputPanel id="returnOrderedbookPanel">
+        <h:form id="returnOrderedbookForm">
+          <p:commandButton id="returnOrderedbookYesButton" value="#{messages.label_yes}" action="#{familyBean.returnBoughtBook}" 
+          	update=":orderbookForm:orderbookPanelGrid" 
+          	oncomplete="PF('returnOrderedbookDialogWidget').hide()" />
+          <p:commandButton id="returnOrderedbookNoButton" value="#{messages.label_no}" onclick="PF('returnOrderedbookDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:confirmDialog>
+    
+    
+	
+    
+    
+    
+    <p:dialog id="createPaymentDialog" header="#{messages.label_create} Billing Record" modal="true" widgetVar="createPaymentDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:outputPanel id="createPaymentPanel">
+        <h:form id="createPaymentForm" enctype="multipart/form-data">
+          <h:panelGrid id="createPaymentPanelGrid" columns="1" styleClass="dialog">
+          	<h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputLabel value="Bill Type: " style="color:red"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2" styleClass="dialog">
+	            <p:selectOneRadio value="#{familyBean.familybilling.billingtype}">
+					<p:ajax event="change" update="checknumarea" listener="#{familyBean.listenerShowChecknum}" /> 
+		            <f:selectItem itemLabel="Payment " itemValue="PAYMENT" />
+		            <f:selectItem itemLabel=" Credit " itemValue="CREDIT" />
+		            <f:selectItem itemLabel=" Refund " itemValue="REFUND" />
+		            <f:selectItem itemLabel=" Fine" itemValue="FINE" />
+		        </p:selectOneRadio>
+	            <p:panel columns="3" style="border:none;"
+	            	widgetVar="checknumarea" id="checknumarea" visible="#{familyBean.showChecknum}" >
+		          	<h:outputText value=" Check Number: "/>
+	          		<h:inputText id="checknum" required="#{familyBean.showChecknum}" requiredMessage="Check number is required"
+		          		value="#{familyBean.familybilling.checknum}"/>
+		          	<p:message for="checknum"></p:message>
+	            </p:panel>
+      		</h:panelGrid>
+            <h:panelGrid columns="7" styleClass="dialog">
+            	<h:panelGrid columns="1" styleClass="dialog">
+		          	<h:outputText value="Amount"/>
+	          		<h:inputText id="paymentamount" required="true" requiredMessage="Payment amount is required"
+		          		value="#{familyBean.familybilling.amount}"/>
+		            <p:message for="paymentamount"></p:message>
+	            </h:panelGrid>
+	            
+	            <p:spacer width="10" height="10"></p:spacer>
+	            <h:panelGrid columns="1" styleClass="dialog">
+	          		<h:outputText value="Process Date"/>
+	          		<p:calendar id="processtime" 
+	          			value="#{familyBean.familybilling.processtime.time}" pattern="MM/dd/yyyy" />
+      		  	</h:panelGrid>
+      		  	<p:spacer width="10" height="10"></p:spacer>
+	            <h:panelGrid columns="1" styleClass="dialog">
+		          	<h:outputText value="Description"/>
+		          	<h:inputText id="description" 
+		          		value="#{familyBean.familybilling.description}"/>
+	            </h:panelGrid>
+      		</h:panelGrid>
+      	  </h:panelGrid>
+          
+          <p:commandButton value="#{messages.label_save}" action="#{familyBean.persistPayment}" update=":processPaymentForm:processPaymentPanelGrid :growlForm:growl" />
+          <p:commandButton value="#{messages.label_close}" onclick="PF('createPaymentDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:confirmDialog id="deletePaymentDialog" widgetVar="deletePaymentDialogWidget" message="#{messages.label_delete_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deletion}" severity="alarm">
+      <p:outputPanel id="deletePaymentPanel">
+        <h:form id="deletePaymentForm">
+          <p:commandButton id="deletePaymentYesButton" value="#{messages.label_yes}" action="#{familyBean.deletePayment}" 
+          	update=":processPaymentForm:processPaymentPanelGrid" 
+          	oncomplete="PF('deletePaymentDialogWidget').hide()" />
+          <p:commandButton id="deletePaymentNoButton" value="#{messages.label_no}" onclick="PF('deletePaymentDialogWidget').hide()" type="button" />
           <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
       </p:outputPanel>

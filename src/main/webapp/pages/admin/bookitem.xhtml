@@ -68,57 +68,88 @@
       <p:outputPanel id="createPanel">
         <h:form id="createForm" enctype="multipart/form-data">
           <h:panelGrid id="createPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
-          	<h:panelGrid columns="7" styleClass="dialog">
+          	<h:panelGrid columns="3" styleClass="dialog">
+          	  <h:panelGrid columns="1" styleClass="dialog">
           		<h:outputText value="Book Code"/>
 	          	<h:inputText id="bookcode" required="true" requiredMessage="Bookitem name is required"
 	          		value="#{bookitemBean.bookitem.bookcode}" />
+	            <p:watermark for="bookcode" value="Required" />
 	          	<p:message for="bookcode"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="Book Description:"/>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<h:outputText value="Book Description:"/>
 	          	<h:inputText id="bookitemDescription" required="true" requiredMessage="Bookitem name is required"
 	          		value="#{bookitemBean.bookitem.bookdescription}" />
+	          	<p:watermark for="bookitemDescription" value="Required" />
 	          	<p:message for="bookitemDescription"></p:message>
+              </h:panelGrid>
             </h:panelGrid>
-            
-            <h:panelGrid columns="6" styleClass="dialog">
+            <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+            <h:panelGrid columns="3" styleClass="dialog">
+              <h:panelGrid columns="1" styleClass="dialog">
           		<h:outputText value="Book Name:"/>
 	          	<h:inputText id="bookitemname" required="true" requiredMessage="Bookitem name is required"
 	          		value="#{bookitemBean.bookitem.bookname}" />
+	          	<p:watermark for="bookitemname" value="Required" />
 	          	<p:message for="bookitemname"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Book Chinese Name:"/>
 	          	<h:inputText value="#{bookitemBean.bookitem.bookchinesename}" />
+              </h:panelGrid>
             </h:panelGrid>
-               
-            <h:panelGrid columns="7" styleClass="dialog">
+            <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+            <h:panelGrid columns="3" styleClass="dialog">
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Book price:"/>
 	          	<p:inputNumber id="bookprice" value="#{bookitemBean.bookitem.bookprice}" symbol="$" 
                 	minValue="0" emptyValue="sign"> 
                 </p:inputNumber>
                 <p:message for="bookprice"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
-                <h:outputText value="Book discount price:"/>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Book discount price:"/>
 	          	<p:inputNumber id="bookdiscountprice" value="#{bookitemBean.bookitem.bookdiscountprice}" symbol="$" 
                 	minValue="0" emptyValue="sign">
                 </p:inputNumber>
                 <p:message for="bookdiscountprice"></p:message>
-      		</h:panelGrid>
-      		
-      		 <h:panelGrid columns="7" styleClass="dialog">
+              </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+            <h:panelGrid columns="3" styleClass="dialog">
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Number Sold:"/>
           		<h:inputText id="amountsold" converterMessage="Please enter digits only." 
           			value="#{bookitemBean.bookitem.amountsold}" > 
                	</h:inputText>
                 <p:message for="amountsold"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
                 <h:outputText value="Number in stock:"/>
 	          	<h:inputText id="amountinstock" converterMessage="Please enter digits only." 
 	          		value="#{bookitemBean.bookitem.amountinstock}">
                 </h:inputText>
                 <p:message for="amountinstock"></p:message>
-      		</h:panelGrid>
-      		
-      		
+      		  </h:panelGrid>
+            </h:panelGrid>
       	  </h:panelGrid>
       	  
       	  <p:commandButton id="createSaveButton" value="#{messages.label_save}" 
@@ -133,62 +164,89 @@
       <p:ajax event="close" update=":dataForm:data" listener="#{bookitemBean.handleDialogClose}" />
       <p:outputPanel id="editPanel">
         <h:form id="editForm" enctype="multipart/form-data">
-          <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
-          	<h:panelGrid columns="10" styleClass="dialog">
+          <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1">
+          	<h:panelGrid columns="1" styleClass="dialog">
+          	  <h:panelGrid columns="6" styleClass="dialog">
           		<h:outputText value="Book Code"/>
 	          	<h:inputText id="bookcodeedit" required="true" requiredMessage="Bookitem name is required"
 	          		value="#{bookitemBean.bookitem.bookcode}" />
+	          	<p:watermark for="bookcodeedit" value="Required" />
 	          	<p:message for="bookcodeedit"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	
 	          	<h:outputText value="Active? " />
-      			<p:spacer width="10" height="10"></p:spacer>
         		<p:selectBooleanCheckbox value="#{bookitemBean.bookitem.active}" />
-        
-	          	<h:outputText value="Book Description:"/>
+        	  </h:panelGrid>
+        	</h:panelGrid>
+        	<h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+        	<h:panelGrid columns="5" styleClass="dialog">
+	          <h:panelGrid columns="1" styleClass="dialog">
+        		<h:outputText value="Book Description:"/>
 	          	<h:inputText id="bookitemDescriptionedit" required="true" requiredMessage="Bookitem name is required"
 	          		value="#{bookitemBean.bookitem.bookdescription}" />
+	          	<p:watermark for="bookitemDescriptionedit" value="Required" />
 	          	<p:message for="bookitemDescriptionedit"></p:message>
-            </h:panelGrid>
-            
-            <h:panelGrid columns="6" styleClass="dialog">
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
           		<h:outputText value="Book Name:"/>
 	          	<h:inputText id="bookitemnameedit" required="true" requiredMessage="Bookitem name is required"
 	          		value="#{bookitemBean.bookitem.bookname}" />
+	          	<p:watermark for="bookitemnameedit" value="Required" />
 	          	<p:message for="bookitemnameedit"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Book Chinese Name:"/>
 	          	<h:inputText value="#{bookitemBean.bookitem.bookchinesename}" />
+              </h:panelGrid>
             </h:panelGrid>
-               
-            <h:panelGrid columns="7" styleClass="dialog">
+            <h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+            <h:panelGrid columns="3" styleClass="dialog">   
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Book price:"/>
 	          	<p:inputNumber id="bookpriceedit" value="#{bookitemBean.bookitem.bookprice}" symbol="$" 
                 	minValue="0" emptyValue="sign"> 
                 </p:inputNumber>
                 <p:message for="bookpriceedit"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
-                <h:outputText value="Book discount price:"/>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Book discount price:"/>
 	          	<p:inputNumber id="bookdiscountpriceedit" value="#{bookitemBean.bookitem.bookdiscountprice}" symbol="$" 
                 	minValue="0" emptyValue="sign">
                 </p:inputNumber>
                 <p:message for="bookdiscountpriceedit"></p:message>
-      		</h:panelGrid>
-      		
-      		 <h:panelGrid columns="7" styleClass="dialog">
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Number Sold:"/>
 	          	<h:inputText id="amountsoldedit" converterMessage="Please enter digits only." 
 	          		value="#{bookitemBean.bookitem.amountsold}" > 
                 </h:inputText>
                 <p:message for="amountsoldedit"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
-                <h:outputText value="Number in stock:"/>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+          		<p:spacer width="10"></p:spacer>
+              </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Number in stock:"/>
 	          	<h:inputText id="amountinstockedit" converterMessage="Please enter digits only." 
 	          		value="#{bookitemBean.bookitem.amountinstock}">
                 </h:inputText>
                 <p:message for="amountinstockedit"></p:message>
+      		  </h:panelGrid>
       		</h:panelGrid>
-      		
+      		<h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
       	  </h:panelGrid>
           <p:commandButton id="editSaveButton" value="#{messages.label_save}" 
           	process="editForm" action="#{bookitemBean.persist}" update=":dataForm:data editPanelGrid :growlForm:growl" />

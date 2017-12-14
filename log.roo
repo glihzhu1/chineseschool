@@ -1,0 +1,19 @@
+// Spring Roo 1.3.2.RELEASE [rev 8387857] log opened at 2017-07-25 16:02:28
+project --topLevelPackage com.xilin.management.school
+jpa setup --provider HIBERNATE --database POSTGRES --databaseName NwXilinSchool
+database reverse engineer --schema public --repository true --package ~.model --testAutomatically
+web jsf setup --implementation ORACLE_MOJARRA --library PRIMEFACES --theme SOUTH_STREET
+web jsf all --package ~.web
+email sender setup --hostServer mailserver
+logging setup --level INFO
+email template setup
+perform package
+exit
+// Spring Roo 1.3.2.RELEASE [rev 8387857] log closed at 2017-07-25 16:14:08
+// Spring Roo 1.3.2.RELEASE [rev 8387857] log opened at 2017-07-25 16:19:41
+perform package
+exit
+// Spring Roo 1.3.2.RELEASE [rev 8387857] log closed at 2017-07-25 16:20:01
+// Spring Roo 1.3.2.RELEASE [rev 8387857] log opened at 2017-07-25 16:22:19
+exit
+// Spring Roo 1.3.2.RELEASE [rev 8387857] log closed at 2017-07-25 16:27:41

@@ -98,3 +98,15 @@ a:visited {
    background-color:#D3D3D3;
    background-image:none;
 }
+
+.alignmentLeft {
+ text-align : left;
+ border: 1px solid black;
+ background-color: orange;
+}
+.alignmentRight {
+ text-align : right;
+ border: 1px solid black;
+ background-color: lime;
+}
+

@@ -1,7 +1,9 @@
 package com.xilin.management.school.web.util;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 
 import org.apache.http.Header;
 import org.apache.http.auth.AuthScope;
@@ -45,6 +47,7 @@ public class Utils {
     public static final String ROLE_XILINADMIN = "ROLE_XILINADMIN";
     public static final String ROLE_XILINFAMILY = "ROLE_XILINFAMILY";
     public static final String ROLE_XILINTEACHER = "ROLE_XILINTEACHER";
+    public static final String ROLE_XILINSELLER = "ROLE_XILINSELLER";
     
     public static final Character PERSONNEL_ADMIN = 'A';
     public static final Character PERSONNEL_BOARD = 'B';
@@ -54,6 +57,46 @@ public class Utils {
     public static final String CLASS_STATUS_OPEN = "Open";
     public static final String CLASS_STATUS_FULL = "Full";
     public static final String CLASS_STATUS_CLOSED = "Closed";
+    
+    public static final String FAMILY_TRANSACTION_REGISTER = "RG";
+    public static final String FAMILY_TRANSACTION_BUYBOOK = "BK";
+    
+    //public static final String FAMILY_BILLING_REGISTER = "RG";
+    //public static final String FAMILY_BILLING_BUYBOOK = "BK";
+    public static final String BOOK_TRANSACTION_ORERED = "ORDERED";
+    public static final String BOOK_TRANSACTION_PROCESSED = "PROCESSED";
+    public static final String BOOK_TRANSACTION_RETURNED = "RETURNED";
+    
+    public static final String BILLING_STATUS_PAID = "PAID";
+    public static final String BILLING_STATUS_PROCESSED = "PROCESSED";
+    public static final String BILLING_STATUS_DEACTIVATED = "DEACTIVATED";
+    
+    public static final String BILLING_TYPE_PAYMENT = "PAYMENT";
+    public static final String BILLING_TYPE_CREDIT = "CREDIT";
+    public static final String BILLING_TYPE_REFUND = "REFUND";
+    public static final String BILLING_TYPE_FINE = "FINE";
+    
+    public static final String POD_PERIOD_ONE = "12:00-13:50";
+    public static final String POD_PERIOD_TWO = "14:00-15:50";
+    
+    public static GregorianCalendar dateDaysAgo(int days) {
+    	GregorianCalendar dataCalendar= new GregorianCalendar();
+    	dataCalendar.add(GregorianCalendar.DAY_OF_YEAR, (-1) * days);
+    	
+    	return dataCalendar;
+    }
+    
+    public static GregorianCalendar dateDaysLater(int days) {
+    	GregorianCalendar dataCalendar= new GregorianCalendar();
+    	dataCalendar.add(GregorianCalendar.DAY_OF_YEAR, (1) * days);
+    	
+    	return dataCalendar;
+    }
+    
+    public static boolean dateSameday(Calendar cal1, Calendar cal2) {
+    	return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && 
+    			cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
     
 	public static String bytesToHex(byte[] hash) {
         StringBuffer hexString = new StringBuffer();

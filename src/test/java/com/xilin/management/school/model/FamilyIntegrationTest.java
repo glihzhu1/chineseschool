@@ -72,7 +72,7 @@ public class FamilyIntegrationTest {
 		//		MyCustomFamilySpecs.loadFullSearchTcandidate(null, mydropdownMap, null), pageable);
 		
 		Page<Family> pageData = familyRepository.findAll(
-				MyCustomFamilySpecs.loadFullSearchFamilies("athe", null, null), pageable);
+				MyCustomFamilySpecs.loadFullSearchFamilies("fami", null, null), pageable);
 		
 		long totalElements = pageData.getTotalElements();
 		List<Family> result = pageData.getContent();

@@ -1,6 +1,8 @@
 package com.xilin.management.school.model;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +14,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -63,6 +67,9 @@ public class Semesterpod {
 	@Column(name = "updatedby", length = 40)
     private String updatedby;
 
+	@Transient
+	private boolean selected;
+	
 	public Set<Semesterfamilypod> getSemesterfamilypods() {
         return semesterfamilypods;
     }
@@ -102,6 +109,14 @@ public class Semesterpod {
 	public void setPodhour(String podhour) {
         this.podhour = podhour;
     }
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
 
 	public Calendar getUpdatedtime() {
         return updatedtime;

@@ -8,8 +8,6 @@
   <h:form prependId="false" id="growlForm">
     <p:growl id="growl" showDetail="true" />
     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-    
-     
   </h:form>
 
   <form action="${request.contextPath}/j_spring_security_logout" method="post" id="logoutForm">
@@ -25,21 +23,28 @@
   <h:panelGrid cellspacing="0" cellpadding="0" styleClass="content">
    
     <p:megaMenu orientation="horizontal" style="margin-top:1px">
-      <p:menuitem value="Home" outcome="/pages/admin/main" icon="ui-icon-star"/>
+      <p:menuitem value="Home" outcome="/pages/admin/main" 
+        rendered="#{request.isUserInRole('ROLE_XILINADMIN')}" icon="ui-icon-star"/>
+        
+      <p:menuitem value="Home" outcome="/pages/family/main" 
+        rendered="#{request.isUserInRole('ROLE_XILINFAMILY')}" icon="ui-icon-star"/>
       
-  	  <p:submenu label="Family/Personnel" icon="ui-icon-check">
+  	  <p:submenu label="Family/Personnel" icon="ui-icon-check"
+  	    rendered="#{request.isUserInRole('ROLE_XILINADMIN')}">
         <p:column>
           <p:menu model="#{applicationBean.menuModel}" style="width:198px" />
         </p:column>
       </p:submenu>
       
-      <p:submenu label="Tasks" icon="ui-icon-check">
+      <p:submenu label="Tasks" icon="ui-icon-check"
+        rendered="#{request.isUserInRole('ROLE_XILINADMIN')}">
         <p:column>
           <p:menu model="#{applicationBean.taskMenuModel}" style="width:198px" />
         </p:column>
       </p:submenu>
       
-      <p:submenu label="Classes" icon="ui-icon-check">
+      <p:submenu label="Classes" icon="ui-icon-check" 
+        rendered="#{request.isUserInRole('ROLE_XILINADMIN')}">
         <p:column>
           <p:menu model="#{applicationBean.classMenuModel}" style="width:198px" />
         </p:column>

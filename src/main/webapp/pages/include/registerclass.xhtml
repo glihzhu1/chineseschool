@@ -1,0 +1,184 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	
+		  <p:dataTable id="listRegistered1" value="#{familyBean.registeredFamilytransactions}" rowKey="#{familytransaction.id}"
+            selection="#{familyBean.familytransaction}" selectionMode="single" 
+        	var="familytransaction" emptyMessage="Your have no class registered, select from below and save your selections."
+        	resizableColumns="true" widgetVar="familytransactionsTable" >
+			<p:column headerText="Course">
+            	<h:outputText value="#{familytransaction.semestercourseid.semestercoursecode}" />
+       		</p:column>
+       		<p:column headerText="Grade" >
+            	<h:outputText value="#{familytransaction.semestercourseid.courseinfoid.coursegrade}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Name">
+            	<h:outputText value="#{familytransaction.semestercourseid.courseinfoid.coursename}" >
+            	</h:outputText>
+        	</p:column>
+       		<p:column headerText="Time (Room)">
+            	<h:outputText value="#{familytransaction.semestercourseid.starttime}-#{familytransaction.semestercourseid.endtime} (#{familytransaction.semestercourseid.room})" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Price (capacity)" >
+            	<h:outputText value="$#{familytransaction.semestercourseid.price} (#{familytransaction.semestercourseid.currentcapacity}/#{familytransaction.semestercourseid.maxcapacity} enrolled)" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Book - Price" styleClass="action-column">
+            	<p:commandLink rendered="#{familytransaction.semestercourseid.bookitemid ne null}"
+            		value="#{familytransaction.semestercourseid.bookitemid.bookname} - $#{familytransaction.semestercourseid.bookitemid.bookprice}"
+            		update=":regiterStudentForm:bookitemDetailrow" 
+            		oncomplete="PF('bookitemOProw').show('#{component.clientId}')">
+            		<f:setPropertyActionListener value="#{familytransaction.semestercourseid.bookitemid}" target="#{familyBean.bookitem}" />
+            	</p:commandLink>
+            	<p:spacer width="2"></p:spacer>
+            	<p:commandButton id="deleteBookButton" icon="fa fa-fw fa-times-circle-o" 
+            	  rendered="#{familytransaction.bookitemid ne null and familytransaction.status eq 'ORDERED'}"
+            	  oncomplete="PF('deleteBookDialogWidget').show()" 
+            	  title="#{messages.label_delete}">
+                  <f:setPropertyActionListener value="#{familytransaction}" target="#{familyBean.familytransaction}" />
+                </p:commandButton>
+                <p:tooltip for="deleteBookButton" position="top" value="#{messages.label_delete}" showEffect="fade" hideEffect="fade" />
+            
+            	<p:commandButton id="addBookButton" icon="fa fa-fw fa-shopping-cart" 
+            	  rendered="#{(familytransaction.bookitemid eq null or familytransaction.status eq 'RETURNED') and familytransaction.semestercourseid.bookitemid ne null}"
+            	  oncomplete="PF('addBookDialogWidget').show()" 
+            	  title="Add">
+                  <f:setPropertyActionListener value="#{familytransaction}" target="#{familyBean.familytransaction}" />
+                </p:commandButton>
+                <p:tooltip for="addBookButton" position="top" value="Add" showEffect="fade" hideEffect="fade" />
+            
+            
+       		</p:column>
+       		<p:column headerText="Teacher">
+            	<p:commandLink value="#{familytransaction.semestercourseid.teacherid.lastname}, #{familytransaction.semestercourseid.teacherid.firstname}"
+            		update=":regiterStudentForm:teacherDetailrow" 
+            		oncomplete="PF('teacherOProw').show('#{component.clientId}')">
+            		<f:setPropertyActionListener value="#{familytransaction.semestercourseid}" target="#{familyBean.semestercourse}" />
+            	</p:commandLink>
+        	</p:column>
+        	<p:column styleClass="action-column">
+            <f:facet name="header">
+              <h:outputText value="Actions" />
+            </f:facet>
+            <p:commandButton id="deleteButton" icon="ui-icon-trash" 
+              oncomplete="PF('deleteDialogWidget').show()" title="#{messages.label_delete}">
+              <f:setPropertyActionListener value="#{familytransaction}" target="#{familyBean.familytransaction}" />
+            </p:commandButton>
+            <p:tooltip for="deleteButton" position="top" value="#{messages.label_delete}" showEffect="fade" hideEffect="fade" />
+          </p:column>
+          </p:dataTable>
+          
+          <br/>
+          
+		  <p:dataTable id="list" value="#{familyBean.allSemestercourses}" rowKey="#{semestercourse.id}"
+                 selection="#{familyBean.semestercourse}" selectionMode="single" 
+        var="semestercourse" rendered="#{not empty familyBean.allSemestercourses}" resizableColumns="true" 
+        filteredValue="#{familyBean.filteredSemestercourses}" widgetVar="semestercoursesTable"
+        paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
+
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search Available Classes for registration:" />
+					<h:inputText id="globalFilter"
+						onkeyup="PF('semestercoursesTable').filter()" />
+				</p:outputPanel>		
+			</f:facet>
+
+			<p:column headerText="Select Class" styleClass="action-column">
+            	<p:selectBooleanCheckbox rendered="#{not semestercourse.selected}" value="#{semestercourse.selected}" />
+        	</p:column>
+        	
+        	<p:column headerText="Need Book?" styleClass="action-column">
+            	<p:selectBooleanCheckbox value="#{semestercourse.selectedbook}" 
+            	  rendered="#{semestercourse.bookitemid ne null}"/>
+        	</p:column>
+        		
+			<p:column headerText="Course (Status)" sortBy="#{semestercourse.semestercoursecode}"
+				filterMatchMode="contains" filterBy="#{semestercourse.semestercoursecode}">
+            	<h:outputText value="#{semestercourse.semestercoursecode}-" />
+            	<h:outputText value="(#{semestercourse.status})" style="font-weight: bold; color: red;"/>
+       		</p:column>
+       		<p:column headerText="Grade" sortBy="#{semestercourse.courseinfoid.coursegrade}" 
+       			filterMatchMode="contains" filterBy="#{semestercourse.courseinfoid.coursegrade}">
+            	<h:outputText value="#{semestercourse.courseinfoid.coursegrade}" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Name" sortBy="#{semestercourse.courseinfoid.coursename}" 
+       			filterMatchMode="contains" filterBy="#{semestercourse.courseinfoid.coursename}">
+            	<h:outputText value="#{semestercourse.courseinfoid.coursename}" >
+            	</h:outputText>
+        	</p:column>
+       		<p:column headerText="Time (Room)" sortBy="#{semestercourse.starttime}" 
+       			filterMatchMode="contains" filterBy="#{semestercourse.room}">
+            	<h:outputText value="#{semestercourse.starttime}-#{semestercourse.endtime} (#{semestercourse.room})" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Price (capacity)" sortBy="#{semestercourse.price}" >
+            	<h:outputText value="$#{semestercourse.price} (#{semestercourse.currentcapacity}/#{semestercourse.maxcapacity} enrolled)" >
+            	</h:outputText>
+        	</p:column>
+        	<p:column headerText="Book" sortBy="#{semestercourse.bookitemid.bookname}"
+       			filterMatchMode="contains" filterBy="#{semestercourse.bookitemid.bookname}">
+            	<p:commandLink value="#{semestercourse.bookitemid ne null? semestercourse.bookitemid.bookname : ''}"
+            		update=":regiterStudentForm:bookitemDetailrow" 
+            		oncomplete="PF('bookitemOProw').show('#{component.clientId}')">
+            		<f:setPropertyActionListener value="#{semestercourse.bookitemid}" target="#{familyBean.bookitem}" />
+            	</p:commandLink>
+       		</p:column>
+       		<p:column headerText="Teacher" sortBy="#{semestercourse.teacherid.lastname}" 
+        		filterMatchMode="contains" filterBy="#{semestercourse.teacherid.lastname}">
+            	<p:commandLink value="#{semestercourse.teacherid.lastname}, #{semestercourse.teacherid.firstname}"
+            		update=":regiterStudentForm:teacherDetailrow" 
+            		oncomplete="PF('teacherOProw').show('#{component.clientId}')">
+            		<f:setPropertyActionListener value="#{semestercourse}" target="#{familyBean.semestercourse}" />
+            	</p:commandLink>
+        	</p:column>
+          </p:dataTable>
+	
+		
+    	<p:confirmDialog id="deleteBookDialog" widgetVar="deleteBookDialogWidget" appendTo="@(body)"
+    	  message="#{messages.label_delete_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deletion}" severity="alarm">
+	      <p:outputPanel id="deleteBookPanel">
+	        <h:form id="deleteBookForm">
+	          <p:commandButton id="deleteBookYesButton" value="#{messages.label_yes}" action="#{familyBean.deleteBookRegisteredCls}" 
+	          	update=":regiterStudentForm:regiterStudentPanelGrid" process="@this"
+	          	oncomplete="PF('deleteBookDialogWidget').hide()" />
+	          <p:commandButton id="deleteBookNoButton" value="#{messages.label_no}" onclick="PF('deleteBookDialogWidget').hide()" type="button" />
+	          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	        </h:form>
+	      </p:outputPanel>
+	    </p:confirmDialog>
+    	<p:confirmDialog id="addBookDialog" widgetVar="addBookDialogWidget" appendTo="@(body)"
+    	  message="#{messages.label_add_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm}" severity="alarm">
+	      <p:outputPanel id="addBookPanel">
+	        <h:form id="addBookForm">
+	          <p:commandButton id="addBookYesButton" value="#{messages.label_yes}" process="@this"
+	            action="#{familyBean.addBookRegisteredCls}" 
+	          	update=":regiterStudentForm:regiterStudentPanelGrid" 
+	          	oncomplete="PF('addBookDialogWidget').hide()" />
+	          <p:commandButton id="addBookNoButton" value="#{messages.label_no}" onclick="PF('addBookDialogWidget').hide()" type="button" />
+	          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	        </h:form>
+	      </p:outputPanel>
+	    </p:confirmDialog>
+	    <p:confirmDialog id="deleteDialog" widgetVar="deleteDialogWidget" appendTo="@(body)"
+	      message="#{messages.label_delete_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deletion}" severity="alarm">
+	      <p:outputPanel id="deletePanel">
+	        <h:form id="deleteForm">
+	          <p:commandButton id="deleteYesButton" value="#{messages.label_yes}" action="#{familyBean.deleteRegisteredCls}" 
+	          	update=":regiterStudentForm:regiterStudentPanelGrid" process="@this"
+	          	oncomplete="PF('deleteDialogWidget').hide()" />
+	          <p:commandButton id="deleteNoButton" value="#{messages.label_no}" onclick="PF('deleteDialogWidget').hide()" type="button" />
+	          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	        </h:form>
+	      </p:outputPanel>
+	    </p:confirmDialog>
+    
+    	<ui:include src="overlaypanels.xhtml" />
+		
+</ui:composition>

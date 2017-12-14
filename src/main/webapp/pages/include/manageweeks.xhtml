@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+ 
+  <p:dataTable value="#{semesterBean.semesterweeks}" rowKey="#{semesterweek.id}"
+        selection="#{semesterBean.semesterweek}" selectionMode="single" 
+        rowExpandMode="single"
+        var="semesterweek" emptyMessage="No weeks defined for the semester."
+     	resizableColumns="true" widgetVar="semesterweeksTable" >
+    <f:facet name="header">
+      You can make batch updates of weeks and in-place capacity changes for POD. <br/>
+      Please be aware that week and number will be re-arranged based on week date. <br/>
+      Also inform POD parents if you make changes to the date!!! <br/>
+      Toggle each row to manage PODs of the week and update its capacity in-place!
+    </f:facet> 
+    <!--  	
+    <p:ajax event="rowEdit" listener="#{semesterBean.onRowEdit}" update=":growlForm:growl" />
+    <p:ajax event="rowEditCancel" listener="#{semesterBean.onRowCancel}" update=":growlForm:growl" />
+ 	
+ 	<p:ajax event="cellEdit" listener="#{semesterBean.onCellEdit}" update=":growlForm:growl" />
+ 	-->
+	  <p:ajax event="rowToggle" listener="#{semesterBean.onWeekRowToggle}" update="podTbl"/>
+ 	
+	  <p:column style="width:30px">
+	    <p:rowToggler />
+	  </p:column>
+	  <p:column headerText="Week" >
+	   	<h:outputText id="weekInput" value="#{semesterweek.displayweekid}" />
+	  </p:column>
+	  <p:column headerText="Number" >
+	    <h:outputText id="numberInput" value="#{semesterweek.displaynumber}" />
+	  </p:column>
+	  <p:column headerText="Week Date" >
+	    <p:calendar id="weekdate" required="true" requiredMessage="week date is required"
+	    	disabled="#{semesterweek.passed}"
+	   		value="#{semesterweek.weekdate.time}" pattern="MM/dd/yyyy" />
+	   	<p:message for="weekdate"></p:message>
+	  </p:column>
+	  <p:column headerText="Has Class?" >
+	  	<h:selectBooleanCheckbox value="#{semesterweek.hasclass}" disabled="#{semesterweek.passed}" />
+	  </p:column>
+	  <p:column headerText="Description" >
+	    <p:inputText id="descriptionInput" value="#{semesterweek.description}" 
+	      disabled="#{semesterweek.passed}" style="width:100%"/>
+	  </p:column>
+	  <p:column styleClass="action-column">
+	    <f:facet name="header">
+	      <h:outputText value="Actions" />
+	    </f:facet>
+	    <p:commandButton id="deleteSemesterweekButton" 
+	      oncomplete="PF('deleteSemesterweekDialogWidget').show()" 
+	      rendered="#{!semesterweek.passed}"
+	      update="deleteSemesterweekDialog" icon="fa fa-fw fa-trash-o" 
+	      actionListener="#{semesterBean.onDeleteSemesterweek}"
+	      title="#{messages.label_delete}">
+	      <f:param name="semesterweekrowid" value="#{semesterweek.id}"/>
+	    </p:commandButton>
+	    <p:tooltip for="deleteSemesterweekButton" position="top" value="#{messages.label_delete} Week" showEffect="fade" hideEffect="fade" />
+	   
+	    <p:menuButton value="More">
+           <p:menuitem value="#{messages.label_create} POD" 
+             rendered="#{!semesterweek.passed}"
+             oncomplete="PF('addSemesterpodDialogWidget').show();"
+           	 update="addSemesterpodDialog" icon="fa fa-fw fa-plus" 
+          	 actionListener="#{semesterBean.onAddSemesterpod}" >
+             <f:param name="semesterweekrowid" value="#{semesterweek.id}"/>
+           </p:menuitem>
+           <p:menuitem value="POD Families" 
+             oncomplete="PF('checkSemesterpodmembersDialogWidget').show();"
+           	 update="checkSemesterpodmembersDialog" icon="fa fa-fw fa-user" 
+          	 actionListener="#{semesterBean.onCheckSemesterpodmembers}" >
+             <f:param name="semesterweekrowid" value="#{semesterweek.id}"/>
+           </p:menuitem>  
+         </p:menuButton>
+	   </p:column>
+	   
+   	   <p:rowExpansion>
+		 <p:dataTable id="podTbl" var="pod" value="#{semesterBean.selectedPods}"
+			emptyMessage="no pod needed for the week" rowKey="#{pod.id}" 
+            selection="#{semesterBean.pod}" selectionMode="single"
+            editable="true" editMode="cell"
+            style="width:800px;">
+               
+            <p:ajax event="cellEdit" listener="#{semesterBean.onPodCellEdit}" update=":growlForm:growl" />
+ 
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="Capacity" style="color: blue"></h:outputText>
+				</f:facet>
+				<p:cellEditor>
+			        <f:facet name="output"><h:outputText value="#{pod.capacity}" /></f:facet>
+			        <f:facet name="input"><p:inputText id="capacityInput" value="#{pod.capacity}" /></f:facet>
+			    </p:cellEditor>
+			</p:column>
+			<p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Filled" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{pod.filled}" />
+			</p:column>
+			<p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Hours" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{pod.podhour}" />
+			</p:column>
+			<p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Actions" style="color: blue"></h:outputText>
+				</f:facet>
+				<p:commandButton id="deleteSemesterpodButton" icon="fa fa-trash-o" 
+			      oncomplete="PF('deleteSemesterpodDialogWidget').show()"
+			      update="deleteSemesterpodDialog"
+	      		  actionListener="#{semesterBean.onDeleteSemesterpod}"
+			      title="#{messages.label_delete}">
+			      <f:param name="semesterpodrowid" value="#{pod.id}"/>
+			    </p:commandButton>
+			    <p:tooltip for="deleteSemesterpodButton" position="top" value="#{messages.label_delete}" showEffect="fade" hideEffect="fade" />
+			   
+			   
+			   
+			</p:column>
+		</p:dataTable>
+	</p:rowExpansion>
+ </p:dataTable>
+
+          
+	
+		
+</ui:composition>

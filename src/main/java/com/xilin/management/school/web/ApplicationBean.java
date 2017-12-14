@@ -36,6 +36,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
+import com.xilin.management.school.web.util.Utils;
+
 @ManagedBean
 @SessionScoped
 @Configurable
@@ -110,9 +112,13 @@ public class ApplicationBean  implements Serializable {
 	        	userDetails = (UserDetails)auth.getPrincipal();
 	            
 	        	//Collection<?extends GrantedAuthority> granted = auth.getAuthorities();
-	    		if (hasRole(auth, "ROLE_ADMIN"))
+	    		if (hasRole(auth, Utils.ROLE_XILINADMIN))
 	    		{
 	    			strRedirect = "/pages/admin/main";
+	    		}
+	    		else if (hasRole(auth, Utils.ROLE_XILINFAMILY))
+	    		{
+	    			strRedirect = "/pages/family/main";
 	    		}
 	    		
 	        }

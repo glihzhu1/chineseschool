@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -82,6 +83,8 @@ public class Bookitem {
 	@Column(name = "updatedby", length = 40)
     private String updatedby;
 
+	@Transient
+	boolean selected;
 	
 	public Set<Familytransaction> getFamilytransactions() {
 		return familytransactions;
@@ -186,6 +189,13 @@ public class Bookitem {
 	public void setAmountinstock(Integer amountinstock) {
 		this.amountinstock = amountinstock;
 	}
-	
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
 	
 }

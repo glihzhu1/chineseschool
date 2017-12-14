@@ -94,10 +94,8 @@ public class SemestercourseBean implements Serializable {
 		teacherDropdown = myCustomSchoolService.queryTeacherItems();
 		bookitemDropdown = myCustomSchoolService.queryAllBookitemItems();
 		
-		List<Semester> top1sem = semesterRepository.findTop1ByOrderByUpdatedtimeDesc();
-		if(top1sem != null && top1sem.size()>0)
-			latestSemester = top1sem.get(0);
-		
+		latestSemester = semesterRepository.findFirstByOrderByRegisterstartdateDesc();
+	
     }
 
 	public String getName() {
@@ -190,6 +188,7 @@ public class SemestercourseBean implements Serializable {
         semestercourse.setWaitingcapacity(0);
         semestercourse.setDiscountstatus(false);
         semestercourse.setDiscountamount(new BigDecimal(0));
+        semestercourse.setSemesterid(latestSemester);
         
         createDialogVisible = true;
         return "/pages/admin/semestercourse";
@@ -291,9 +290,6 @@ public class SemestercourseBean implements Serializable {
 		this.filteredSemestercourses = filteredSemestercourses;
 	}
 
-	
-	
-	
 	public List<SelectItem> getTeacherDropdown() {
 		return teacherDropdown;
 	}

@@ -46,7 +46,7 @@ public class SemesterweekDataOnDemand {
     }
 
 	public void setDisplaynumber(Semesterweek obj, int index) {
-        Integer displaynumber = new Integer(index);
+		String displaynumber = "" + index;
         obj.setDisplaynumber(displaynumber);
     }
 
@@ -74,10 +74,7 @@ public class SemesterweekDataOnDemand {
     }
 
 	public void setWeekdate(Semesterweek obj, int index) {
-        String weekdate = "weekdate_" + index;
-        if (weekdate.length() > 40) {
-            weekdate = weekdate.substring(0, 40);
-        }
+        Calendar weekdate = Calendar.getInstance();
         obj.setWeekdate(weekdate);
     }
 

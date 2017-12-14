@@ -5,7 +5,9 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+      
 <ui:composition template="/templates/layout.xhtml">
   <ui:define name="content">
     <h:form prependId="false" id="growlForm">
@@ -15,10 +17,10 @@
     <h:form prependId="false" id="dataForm">
       <p:panel id="data" toggleable="true" toggleSpeed="250">
         <p:dataTable id="list" value="#{semesterBean.allSemesters}" rowKey="#{semester.id}"
-                 selection="#{semesterBean.semester}" selectionMode="single" 
-        var="semester" rendered="#{not empty semesterBean.allSemesters}" resizableColumns="true" 
-        filteredValue="#{semesterBean.filteredSemesters}" widgetVar="semestersTable"
-        paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
+            selection="#{semesterBean.semester}" selectionMode="single" 
+	        var="semester" rendered="#{not empty semesterBean.allSemesters}" resizableColumns="true" 
+	        filteredValue="#{semesterBean.filteredSemesters}" widgetVar="semestersTable"
+	        paginator="true" paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="15,20,50" rows="15">
 
 			<f:facet name="header">
 				<p:outputPanel>
@@ -51,17 +53,30 @@
               <h:outputText value="Actions" />
             </f:facet>
             
-            <p:commandButton id="editButton" icon="fa fa-fw fa-edit" update=":editForm:editPanelGrid" 
+            <p:commandButton id="editButton" icon="fa fa-fw fa-edit" 
+              update=":editForm:editPanelGrid" rendered="#{!semester.passed or !semester.active}"
               action="#{semesterBean.onEdit}" oncomplete="PF('editDialogWidget').show()" title="#{messages.label_edit}">
               <f:setPropertyActionListener value="#{semester}" target="#{semesterBean.semester}" />
             </p:commandButton>
             <p:tooltip for="editButton" position="top" value="#{messages.label_edit} semester" showEffect="fade" hideEffect="fade" />
             
-            <p:commandButton id="deactivateButton" icon="fa fa-fw fa-close" rendered="#{semester.active}"
-            	oncomplete="PF('deactivateDialogWidget').show()" title="#{messages.label_deactivate}">
-              <f:setPropertyActionListener value="#{semester}" target="#{semesterBean.semester}" />
-            </p:commandButton>
-            <p:tooltip for="deactivateButton" position="top" value="Deactivate" showEffect="fade" hideEffect="fade" />
+            <p:menuButton value="More">
+              <p:menuitem value="Manage Week/POD" oncomplete="PF('manageweekDialogWidget').show();"
+              	update="manageweekDialog" icon="fa fa-fw fa-wrench" 
+	            actionListener="#{semesterBean.onManageSemesterweek}"
+	            rendered="#{!semester.passed or semester.active}">
+	              <f:param name="semesterrowid" value="#{semester.id}"/>
+	          </p:menuitem>
+	          
+	          <p:menuitem value="Deactivate Semester" oncomplete="PF('deactivateDialogWidget').show();"
+              	update="deactivateDialog" icon="fa fa-fw fa-close"
+              	actionListener="#{semesterBean.onDeactivateSemester}"
+	            rendered="#{semester.active}">
+	              <f:param name="semesterrowid" value="#{semester.id}"/>
+	          </p:menuitem>
+	          
+	        </p:menuButton>
+          
           </p:column>
         </p:dataTable>
       </p:panel>
@@ -71,93 +86,98 @@
       <p:ajax event="close" update=":dataForm:data" listener="#{semesterBean.handleDialogClose}" />
       <p:outputPanel id="createPanel">
         <h:form id="createForm" enctype="multipart/form-data">
+          <h:panelGrid columns="1" styleClass="dialog">
+              <p:panelGrid columns="1">
+		        <h:outputText value="Classes will stay the same as the latest last semester, "/>
+		        <h:outputText value="by default 15 weeks and PODs will be created. "/>
+			  </p:panelGrid>
+          </h:panelGrid>
           <h:panelGrid id="createPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
-          	<h:panelGrid columns="3" styleClass="dialog">
+            <h:panelGrid columns="3" styleClass="dialog">
 	          	<h:outputText value="Semester:"/>
 	          	<h:inputText id="semesterDescription" required="true" requiredMessage="Semester name is required"
 	          		value="#{semesterBean.semester.description}" />
 	          	<p:message for="semesterDescription"></p:message>
             </h:panelGrid>
-            <h:panelGrid columns="7" styleClass="dialog">
-	          	<h:outputText value="Start:"/>
+            <h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+          	<h:panelGrid columns="3" styleClass="dialog" columnClasses="col1,col1,col1" >
+          	  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Class Start:"/>
 	          	<p:calendar id="startDte" required="true" requiredMessage="start date is required"
-	          		value="#{semesterBean.startDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.startdate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="startDte"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="End:"/>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Class End:"/>
 	          	<p:calendar id="endDte" required="true" requiredMessage="end date is required"
-	          		value="#{semesterBean.endDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.enddate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="endDte"></p:message>
-	          	
-      		</h:panelGrid>
-      		
-      		<h:panelGrid columns="7" styleClass="dialog">
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Register Start:"/>
 	          	<p:calendar id="registerstartdate" required="true" requiredMessage="start date is required"
-	          		value="#{semesterBean.registerStartDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.registerstartdate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="registerstartdate"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="Register End:"/>
-	          	<p:calendar id="registerenddate" required="true" requiredMessage="end date is required"
-	          		value="#{semesterBean.registerEndDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="registerenddate"></p:message>
-      		</h:panelGrid>
-      		
-      		<h:panelGrid columns="7" styleClass="dialog">
-	          	<h:outputText value="Pay Start:"/>
-	          	<p:calendar id="paystartdate" required="true" requiredMessage="start date is required"
-	          		value="#{semesterBean.payStartDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="paystartdate"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="Pay End:"/>
-	          	<p:calendar id="payenddate" required="true" requiredMessage="end date is required"
-	          		value="#{semesterBean.payEndDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="payenddate"></p:message>
-      		</h:panelGrid>
-      		
-      		<h:panelGrid columns="3" styleClass="dialog">
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Discount Date:"/>
 	          	<p:calendar id="discountdate" required="true" requiredMessage="discount date is required"
-	          		value="#{semesterBean.discountDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.discountdate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="discountdate"></p:message>
-      		</h:panelGrid>
-      		
-            <h:panelGrid columns="7" styleClass="dialog">
-	          	<h:outputText value="Registation Fee:"/>
-	          	<p:inputNumber id="registrationfee" value="#{semesterBean.semester.registrationfee}" symbol="$" 
-                	minValue="0" emptyValue="sign"> 
-                </p:inputNumber>
-                <p:message for="registrationfee"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
                 <h:outputText value="Discount Amount:"/>
 	          	<p:inputNumber id="discountamount" value="#{semesterBean.semester.discountamount}" symbol="$" 
                 	minValue="0" emptyValue="sign">
                 </p:inputNumber>
                 <p:message for="discountamount"></p:message>
-      		</h:panelGrid>
-                
-            <h:panelGrid columns="7" styleClass="dialog">
+      		  </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Return Check Fine:"/>
+	          	<p:inputNumber id="returnedcheckfee" value="#{semesterBean.semester.returnedcheckfee}" symbol="$" 
+                	minValue="0" emptyValue="sign"> 
+                </p:inputNumber>
+                <p:message for="returnedcheckfee"></p:message>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Registation Fee:"/>
+	          	<p:inputNumber id="registrationfee" value="#{semesterBean.semester.registrationfee}" symbol="$" 
+                	minValue="0" emptyValue="sign"> 
+                </p:inputNumber>
+                <p:message for="registrationfee"></p:message>
+      		  </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="POD Fee:"/>
 	          	<p:inputNumber id="podfee" value="#{semesterBean.semester.podfee}" symbol="$" 
                 	minValue="0" emptyValue="sign"> 
                 </p:inputNumber>
                 <p:message for="podfee"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
                 <h:outputText value="POD Refund Amount:"/>
 	          	<p:inputNumber id="podrefundamount" value="#{semesterBean.semester.podrefundamount}" symbol="$" 
                 	minValue="0" emptyValue="sign">
                 </p:inputNumber>
                 <p:message for="podrefundamount"></p:message>
+      		  </h:panelGrid>
+      		  
       		</h:panelGrid>
-      		
-      		<h:panelGrid columns="3" styleClass="dialog">
-	          	<h:outputText value="Check Returned Fine:"/>
-	          	<p:inputNumber id="returnedcheckfee" value="#{semesterBean.semester.returnedcheckfee}" symbol="$" 
-                	minValue="0" emptyValue="sign"> 
-                </p:inputNumber>
-                <p:message for="returnedcheckfee"></p:message>
-      		</h:panelGrid>
-      		
+      		<!-- 
+      		<h:panelGrid columns="1" styleClass="dialog">
+              <p:panelGrid columns="1">
+		        <h:outputText value="Copy From (will copy classes/weeks/pod/):"/>
+		        <p:selectOneMenu size="1" value="#{semesterBean.semesterId}" >
+		          <f:selectItem itemValue="" itemLabel="Select"/>
+				  <f:selectItems value="#{semesterBean.semesterDropdown}" />
+			    </p:selectOneMenu>
+			  </p:panelGrid>
+            </h:panelGrid>
+             -->
+      		<h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
       	  </h:panelGrid>
       	  
       	  <p:commandButton id="createSaveButton" value="#{messages.label_save}" 
@@ -170,6 +190,9 @@
     
     <p:dialog id="editDialog" header="#{messages.label_edit} Semester" modal="true" widgetVar="editDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
       <p:ajax event="close" update=":dataForm:data" listener="#{semesterBean.handleDialogClose}" />
+      
+      <h:outputText value="For any date update, please don't forget adjust your weeks/pods." style="color: red" />
+	  <br/>
       <p:outputPanel id="editPanel">
         <h:form id="editForm" enctype="multipart/form-data">
           <h:panelGrid id="editPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
@@ -184,87 +207,85 @@
         		<p:selectBooleanCheckbox value="#{semesterBean.semester.active}" />
         
             </h:panelGrid>
-            <h:panelGrid columns="7" styleClass="dialog">
-	          	<h:outputText value="Start:"/>
+            <h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+            <h:panelGrid columns="3" styleClass="dialog">
+              <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Class Start:"/>
 	          	<p:calendar id="startDteedit" required="true" requiredMessage="start date is required"
-	          		value="#{semesterBean.startDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.startdate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="startDteedit"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="End:"/>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Class End:"/>
 	          	<p:calendar id="endDteedit" required="true" requiredMessage="end date is required"
-	          		value="#{semesterBean.endDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.enddate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="endDteedit"></p:message>
-	          	
-      		</h:panelGrid>
-      		
-      		<h:panelGrid columns="7" styleClass="dialog">
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Register Start:"/>
 	          	<p:calendar id="registerstartdateedit" required="true" requiredMessage="start date is required"
-	          		value="#{semesterBean.registerStartDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.registerstartdate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="registerstartdateedit"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="Register End:"/>
-	          	<p:calendar id="registerenddateedit" required="true" requiredMessage="end date is required"
-	          		value="#{semesterBean.registerEndDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="registerenddateedit"></p:message>
+      		  </h:panelGrid>
       		</h:panelGrid>
-      		
-      		<h:panelGrid columns="7" styleClass="dialog">
-	          	<h:outputText value="Pay Start:"/>
-	          	<p:calendar id="paystartdateedit" required="true" requiredMessage="start date is required"
-	          		value="#{semesterBean.payStartDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="paystartdateedit"></p:message>
-	          	<p:spacer width="10" height="10"></p:spacer>
-	          	<h:outputText value="Pay End:"/>
-	          	<p:calendar id="payenddateedit" required="true" requiredMessage="end date is required"
-	          		value="#{semesterBean.payEndDate}" pattern="MM/dd/yyyy" />
-	          	<p:message for="payenddateedit"></p:message>
-      		</h:panelGrid>
-      		
+      		<h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
       		<h:panelGrid columns="3" styleClass="dialog">
+      		  <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="Discount Date:"/>
 	          	<p:calendar id="discountdateedit" required="true" requiredMessage="discount date is required"
-	          		value="#{semesterBean.discountDate}" pattern="MM/dd/yyyy" />
+	          		value="#{semesterBean.semester.discountdate.time}" pattern="MM/dd/yyyy" />
 	          	<p:message for="discountdateedit"></p:message>
-      		</h:panelGrid>
-      		
-            <h:panelGrid columns="7" styleClass="dialog">
-	          	<h:outputText value="Registation Fee:"/>
-	          	<p:inputNumber id="registrationfeeedit" value="#{semesterBean.semester.registrationfee}" symbol="$" 
-                	minValue="0" emptyValue="sign"> 
-                </p:inputNumber>
-                <p:message for="registrationfeeedit"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
                 <h:outputText value="Discount Amount:"/>
 	          	<p:inputNumber id="discountamountedit" value="#{semesterBean.semester.discountamount}" symbol="$" 
                 	minValue="0" emptyValue="sign">
                 </p:inputNumber>
                 <p:message for="discountamountedit"></p:message>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Return Check Fine:"/>
+	          	<p:inputNumber id="returnedcheckfeeedit" value="#{semesterBean.semester.returnedcheckfee}" symbol="$" 
+                	minValue="0" emptyValue="sign"> 
+                </p:inputNumber>
+                <p:message for="returnedcheckfeeedit"></p:message>
+      		  </h:panelGrid>
       		</h:panelGrid>
-                
-            <h:panelGrid columns="7" styleClass="dialog">
+      		<h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
+      		<h:panelGrid columns="3" styleClass="dialog">
+              <h:panelGrid columns="1" styleClass="dialog">
+	          	<h:outputText value="Registation Fee:"/>
+	          	<p:inputNumber id="registrationfeeedit" value="#{semesterBean.semester.registrationfee}" symbol="$" 
+                	minValue="0" emptyValue="sign"> 
+                </p:inputNumber>
+                <p:message for="registrationfeeedit"></p:message>
+      		  </h:panelGrid>
+              <h:panelGrid columns="1" styleClass="dialog">
 	          	<h:outputText value="POD Fee:"/>
 	          	<p:inputNumber id="podfeeedit" value="#{semesterBean.semester.podfee}" symbol="$" 
                 	minValue="0" emptyValue="sign"> 
                 </p:inputNumber>
                 <p:message for="podfeeedit"></p:message>
-                <p:spacer width="10" height="10"></p:spacer>
+      		  </h:panelGrid>
+      		  <h:panelGrid columns="1" styleClass="dialog">
                 <h:outputText value="POD Refund Amount:"/>
 	          	<p:inputNumber id="podrefundamountedit" value="#{semesterBean.semester.podrefundamount}" symbol="$" 
                 	minValue="0" emptyValue="sign">
                 </p:inputNumber>
                 <p:message for="podrefundamountedit"></p:message>
+      		  </h:panelGrid>
       		</h:panelGrid>
-      		
-      		<h:panelGrid columns="3" styleClass="dialog">
-	          	<h:outputText value="Check Returned Fine:"/>
-	          	<p:inputNumber id="returnedcheckfeeedit" value="#{semesterBean.semester.returnedcheckfee}" symbol="$" 
-                	minValue="0" emptyValue="sign"> 
-                </p:inputNumber>
-                <p:message for="returnedcheckfeeedit"></p:message>
-      		</h:panelGrid>
-      		
+      		<h:panelGrid columns="1" styleClass="dialog">
+              <p:spacer height="10"></p:spacer>
+            </h:panelGrid>
       	  </h:panelGrid>
+      	  
           <p:commandButton id="editSaveButton" value="#{messages.label_save}" 
           	process="editForm" action="#{semesterBean.persist}" update=":dataForm:data editPanelGrid :growlForm:growl" />
           <p:commandButton id="editCloseButton" value="#{messages.label_close}" onclick="PF('editDialogWidget').hide()" type="button" />
@@ -282,6 +303,187 @@
         </h:form>
       </p:outputPanel>
     </p:confirmDialog>
+    
+    <p:dialog id="manageweekDialog" header="Manage weeks for semester: #{semesterBean.semester.description}"
+      width="1000" height="500"
+      modal="true" widgetVar="manageweekDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:outputPanel id="manageweekPanel">
+        <h:form id="manageweekForm" enctype="multipart/form-data">
+          <p:commandButton value="New Week" 
+	        oncomplete="PF('addSemesterweekDialogWidget').show()" 
+		    update="addSemesterweekDialog"
+		    actionListener="#{semesterBean.onAddSemesterweek}" />
+	  	  <p:commandButton value="Confirm Updates" action="#{semesterBean.batchSemesterweekUpdate}"
+	        process=":manageweekForm:manageweekPanelGrid @this" update="manageweekPanelGrid :growlForm:growl" />
+          
+          <p:panelGrid id="manageweekPanelGrid" columns="1" styleClass="dialog">
+			<ui:include src="../include/manageweeks.xhtml" />
+		  </p:panelGrid>
+	      
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:confirmDialog id="deleteSemesterweekDialog" widgetVar="deleteSemesterweekDialogWidget" message="#{messages.label_delete_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deletion}" severity="alarm">
+      <p:outputPanel id="deleteSemesterweekPanel">
+        <h:form id="deleteSemesterweekForm">
+          <p:commandButton id="deleteSemesterweekYesButton" value="#{messages.label_yes}" action="#{semesterBean.deleteSemesterweek}" 
+          	update=":manageweekForm:manageweekPanelGrid :growlForm:growl" 
+          	oncomplete="PF('deleteSemesterweekDialogWidget').hide()" />
+          <p:commandButton id="deleteSemesterweekNoButton" value="#{messages.label_no}" onclick="PF('deleteSemesterweekDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:confirmDialog>
+    <p:dialog id="addSemesterpodDialog" header="#{messages.label_create} POD for week #{semesterBean.semesterweek.displayweekid}" modal="true" 
+      widgetVar="addSemesterpodDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":manageweekForm:manageweekPanelGrid" />
+      <p:outputPanel id="addSemesterpodPanel">
+        <h:form id="addSemesterpodForm" enctype="multipart/form-data">
+          <h:panelGrid id="addSemesterpodPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+            <h:panelGrid columns="3" styleClass="dialog">
+              <h:outputText value="Hour:"/>
+              <p:spacer height="10" width="5"></p:spacer>
+              <h:selectOneListbox size="1" id="podHour" value="#{semesterBean.pod.podhour}" >
+				<f:selectItem itemLabel="13:00-14:50" itemValue="13:00-14:50" />
+				<f:selectItem itemLabel="15:00-16:50" itemValue="15:00-16:50" />
+			  </h:selectOneListbox>
+            </h:panelGrid>
+          </h:panelGrid>
+          <p:commandButton id="addSemesterpodSaveButton" value="#{messages.label_save}" 
+      	    process="addSemesterpodForm" action="#{semesterBean.addSemesterpod}" 
+      	    oncomplete="PF('addSemesterpodDialogWidget').hide()"
+      	    update=":manageweekForm:manageweekPanelGrid :growlForm:growl" />
+          <p:commandButton id="addSemesterpodCloseButton" value="#{messages.label_close}" onclick="PF('addSemesterpodDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    <p:dialog id="checkSemesterpodmembersDialog" header="Participating families for week #{semesterBean.semesterweek.displayweekid}" modal="true" 
+      widgetVar="checkSemesterpodmembersDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":manageweekForm:manageweekPanelGrid" />
+      <p:outputPanel id="checkSemesterpodmembersPanel">
+        <h:form id="checkSemesterpodmembersForm" enctype="multipart/form-data">
+          <div style="text-align: right;">
+            <p:commandButton value="Confirm Performed" action="#{semesterBean.batchSemesterpodPerformedUpdate}"
+	        process="checkSemesterpodmembersForm" update="checkSemesterpodmembersPanelGrid :growlForm:growl" />
+          </div>
+          <h:panelGrid id="checkSemesterpodmembersPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+            <p:dataTable id="podFamilies" var="familypod" value="#{semesterBean.semesterfamilypods}"
+			  emptyMessage="no family signed up for the week yet" rowKey="#{familypod.id}" 
+              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+              paginator="true" rows="10" style="margin-bottom:20px; width:800px;"
+              selection="#{semesterBean.familypod}" selectionMode="single"
+              editable="true" editMode="cell" >
+              <!--  
+              <p:ajax event="cellEdit" listener="#{semesterBean.onPodCellEdit}" update=":growlForm:growl" />
+ 			  
+			  <p:column>
+				<f:facet name="header">
+					<h:outputText value="Capacity" style="color: blue"></h:outputText>
+				</f:facet>
+				<p:cellEditor>
+			        <f:facet name="output"><h:outputText value="#{pod.capacity}" /></f:facet>
+			        <f:facet name="input"><p:inputText id="capacityInput" value="#{pod.capacity}" /></f:facet>
+			    </p:cellEditor>
+			  </p:column>
+			  -->
+			  <p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="FLName - ID" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{familypod.familyid.fatherlastname} - #{familypod.familyid.id}" />
+			  </p:column>
+			  <p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Phone" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{familypod.familyid.homephone}" />
+			  </p:column>
+			  <p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Cell" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{familypod.familyid.cellphone}" />
+			  </p:column>
+			  <p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Email" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{familypod.familyid.email}" />
+			  </p:column>
+			  <p:column styleClass="action-column">
+				<f:facet name="header">
+					<h:outputText value="Hours" style="color: blue"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{familypod.semesterpodid.podhour}" />
+			  </p:column>
+			  <p:column headerText="Performed?" >
+	  			<h:selectBooleanCheckbox value="#{familypod.performed}" />
+	  		  </p:column>
+		    </p:dataTable>
+		    
+          </h:panelGrid>
+          
+         <!-- 
+          <p:panel header="Export PDF">  
+	       <p:commandLink id="pdf" ajax="false" process=":checkSemesterpodmembersForm">
+	         <p:graphicImage value="/resources/images/pdf.png"/>  
+	           <f:setPropertyActionListener value="true" target="#{exporterController.customExporter}" />  
+	         <pe:exporter type="pdf" target="podFamilies" fileName="listDetails" datasetPadding="4"/>  
+	  
+	        </p:commandLink>    
+	  
+		  </p:panel> 
+	   --> 
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
+    <p:confirmDialog id="deleteSemesterpodDialog" widgetVar="deleteSemesterpodDialogWidget" message="#{messages.label_delete_record}" showEffect="fade" hideEffect="explode" header="#{messages.label_confirm_deletion}" severity="alarm">
+      <p:outputPanel id="deleteSemesterpodPanel">
+        <h:form id="deleteSemesterpodForm">
+          <p:commandButton id="deleteSemesterpodYesButton" value="#{messages.label_yes}" action="#{semesterBean.deleteSemesterpod}" 
+          	update=":manageweekForm:manageweekPanelGrid :growlForm:growl" 
+          	oncomplete="PF('deleteSemesterpodDialogWidget').hide()" />
+          <p:commandButton id="deleteSemesterpodNoButton" value="#{messages.label_no}" onclick="PF('deleteSemesterpodDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:confirmDialog>
+    
+    <p:dialog id="addSemesterweekDialog" header="#{messages.label_create} week for semester #{semesterBean.semester.description}" modal="true" 
+      widgetVar="addSemesterweekDialogWidget" dynamic="true" resizable="true" maximizable="true" showEffect="fade" hideEffect="explode">
+      <p:ajax event="close" update=":manageweekForm:manageweekPanelGrid" />
+      <p:outputPanel id="addSemesterweekPanel">
+        <h:form id="addSemesterweekForm" enctype="multipart/form-data">
+          <h:panelGrid id="addSemesterweekPanelGrid" columns="1" styleClass="dialog" columnClasses="col1" >
+            <h:panelGrid columns="2" styleClass="dialog">
+              <h:outputText value="Description"/>
+              <p:inputText id="descriptionInput" value="#{semesterBean.semesterweek.description}" 
+                required="true" requiredMessage="Description is required"/>
+	  		  <p:spacer width="10" height="10"></p:spacer>
+	  		  <p:message for="descriptionInput"></p:message>
+	  		  
+	  		  <h:outputText value="Week date"/>
+	    	  <p:calendar id="weekdate"
+	   		    value="#{semesterBean.semesterweek.weekdate.time}" pattern="MM/dd/yyyy" />
+	   	      <p:spacer width="10" height="10"></p:spacer>
+	  		  <p:message for="weekdate"></p:message>
+	  
+            </h:panelGrid>
+          </h:panelGrid>
+          <p:commandButton id="addSemesterweekSaveButton" value="#{messages.label_save}" 
+      	    process="addSemesterweekForm" action="#{semesterBean.addSemesterweek}" 
+      	    update=":manageweekForm:manageweekPanelGrid addSemesterweekPanelGrid :growlForm:growl" />
+          <p:commandButton id="addSemesterweekCloseButton" value="#{messages.label_close}" onclick="PF('addSemesterweekDialogWidget').hide()" type="button" />
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+      </p:outputPanel>
+    </p:dialog>
+    
   </ui:define>
 </ui:composition>
 </html>
